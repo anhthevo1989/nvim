@@ -5,44 +5,91 @@ FILE: lua/plugins/ux/snacks.lua
 
 PURPOSE
 -------
-Declare Snacks plugin (UX system core).
+Configure Snacks UX system (picker enabled).
 
 WHY THIS FILE EXISTS
 --------------------
-Snacks provides a unified UX layer that will replace:
-- Telescope (picker)
-- Toggleterm (terminal)
-- which-key (key hints)
-- UI input + notifications
-
-At this stage, we ONLY install the core plugin.
+- Enables Snacks picker (fuzzy finder)
+- Replaces Telescope functionality
+- Provides fast file + search navigation
 
 HOW IT WORKS
 ------------
-- lazy.nvim loads the plugin
-- No modules are enabled yet
-- This ensures a clean baseline before adding features
+- lazy.nvim loads Snacks
+- Picker module is enabled via opts
+- Keymaps trigger picker actions
 
 FLOW
 ----
 plugins/init.lua
-  → imports plugins.ux
-      → loads this file
-          → registers Snacks
+  → plugins.ux
+      → snacks.lua
+          → enables picker
 
 BEGINNER NOTES
 --------------
-- Do NOT enable any Snacks features yet
-- We will enable features step-by-step
-- This keeps debugging simple
+- Only picker is enabled for now
+- Other modules will be added later
+- Keep config minimal for easier debugging
 
 ===============================================================================
 --]]
 
 return {
+
   {
     "folke/snacks.nvim",
+
     lazy = true,
-    opts = {},
+
+    opts = {
+
+      picker = {
+        enabled = true,
+      },
+
+    },
+
+    keys = {
+
+      -- --------------------------------------------------
+      -- FILE SEARCH
+      -- --------------------------------------------------
+
+      {
+        "<leader>ff",
+        function()
+          require("snacks").picker.files()
+        end,
+        desc = "Find files",
+      },
+
+      -- --------------------------------------------------
+      -- LIVE GREP
+      -- --------------------------------------------------
+
+      {
+        "<leader>fg",
+        function()
+          require("snacks").picker.grep()
+        end,
+        desc = "Grep search",
+      },
+
+      -- --------------------------------------------------
+      -- BUFFERS
+      -- --------------------------------------------------
+
+      {
+        "<leader>fb",
+        function()
+          require("snacks").picker.buffers()
+        end,
+        desc = "Find buffers",
+      },
+
+    },
+
   },
+
 }
