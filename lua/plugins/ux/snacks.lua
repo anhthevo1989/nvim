@@ -5,32 +5,32 @@ FILE: lua/plugins/ux/snacks.lua
 
 PURPOSE
 -------
-Configure Snacks UX system (picker enabled).
+Configure Snacks UX system (picker + terminal).
 
 WHY THIS FILE EXISTS
 --------------------
-- Enables Snacks picker (fuzzy finder)
-- Replaces Telescope functionality
-- Provides fast file + search navigation
+- Enables fuzzy finder (picker)
+- Adds integrated terminal
+- Builds core UX layer
 
 HOW IT WORKS
 ------------
-- lazy.nvim loads Snacks
-- Picker module is enabled via opts
-- Keymaps trigger picker actions
+- Snacks loads modules via opts
+- Picker handles navigation
+- Terminal provides shell inside Neovim
 
 FLOW
 ----
 plugins/init.lua
   → plugins.ux
       → snacks.lua
-          → enables picker
+          → enables picker + terminal
 
 BEGINNER NOTES
 --------------
-- Only picker is enabled for now
-- Other modules will be added later
-- Keep config minimal for easier debugging
+- Only picker + terminal enabled
+- Other modules added later
+- Keep configuration minimal
 
 ===============================================================================
 --]]
@@ -44,7 +44,19 @@ return {
 
     opts = {
 
+      -- --------------------------------------------------
+      -- PICKER
+      -- --------------------------------------------------
+
       picker = {
+        enabled = true,
+      },
+
+      -- --------------------------------------------------
+      -- TERMINAL
+      -- --------------------------------------------------
+
+      terminal = {
         enabled = true,
       },
 
@@ -65,7 +77,7 @@ return {
       },
 
       -- --------------------------------------------------
-      -- LIVE GREP
+      -- GREP SEARCH
       -- --------------------------------------------------
 
       {
@@ -86,6 +98,18 @@ return {
           require("snacks").picker.buffers()
         end,
         desc = "Find buffers",
+      },
+
+      -- --------------------------------------------------
+      -- TERMINAL TOGGLE
+      -- --------------------------------------------------
+
+      {
+        "<leader>tt",
+        function()
+          require("snacks").terminal.toggle()
+        end,
+        desc = "Toggle terminal",
       },
 
     },
