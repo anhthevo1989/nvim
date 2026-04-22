@@ -1,18 +1,39 @@
 -- ==========================================================
+-- PLUGIN SYSTEM
+-- ==========================================================
+
 -- PURPOSE
--- Setup lazy.nvim plugin manager
---
+-- -------
+-- Initialize and manage plugins using lazy.nvim
+
 -- WHY IT EXISTS
--- Provides structured plugin management system
---
+-- -------------
+-- Neovim does not include a built-in plugin manager.
+-- This file installs and configures lazy.nvim.
+
 -- HOW IT WORKS
--- Bootstraps lazy.nvim if missing, then initializes it
---
+-- ------------
+-- 1. Check if lazy.nvim exists locally
+-- 2. Clone it if missing
+-- 3. Add it to runtime path
+-- 4. Initialize plugin system
+
 -- FLOW
--- bootstrap → runtimepath → setup
---
+-- ----
+-- startup
+-- → check lazy.nvim
+-- → install if missing
+-- → load plugin system
+-- → register plugins
+
 -- BEGINNER NOTES
--- This file controls all plugin loading
+-- --------------
+-- This file controls ALL plugins.
+-- Only declare plugins here during early phases.
+-- Do NOT configure plugins yet.
+
+-- ==========================================================
+-- BOOTSTRAP LAZY.NVIM
 -- ==========================================================
 
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
@@ -30,6 +51,23 @@ end
 
 vim.opt.rtp:prepend(lazypath)
 
+-- ==========================================================
+-- PLUGIN REGISTRATION
+-- ==========================================================
+
 require("lazy").setup({
-  spec = {},
+
+  spec = {
+
+    -- ------------------------------------------------------
+    -- TREESITTER
+    -- ------------------------------------------------------
+
+    {
+      "nvim-treesitter/nvim-treesitter",
+      build = ":TSUpdate",
+    },
+
+  },
+
 })
