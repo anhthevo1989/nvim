@@ -1,15 +1,3 @@
---[[
-===============================================================================
-FILE: lua/plugins/editing/init.lua
-===============================================================================
-
-PURPOSE
--------
-Load all editing-related plugins.
-
-===============================================================================
---]]
-
 return {
 
   {
@@ -49,6 +37,14 @@ return {
     version = false,
     config = function()
       require("mini.indentscope").setup()
+    end,
+  },
+
+  {
+    "echasnovski/mini.cursorword",
+    version = false,
+    config = function()
+      require("mini.cursorword").setup()
     end,
   },
 
