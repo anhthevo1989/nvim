@@ -8,73 +8,69 @@
 -- WHAT THIS DOES
 -- --------------
 -- - Installs LSP servers via Mason
--- - Automatically configures them
 -- - Connects LSP to nvim-cmp
--- - Uses modern Neovim (0.11+) API
---
--- SERVERS INCLUDED
--- ----------------
--- - lua_ls  (Lua)
--- - bashls  (Bash)
---
--- BEGINNER NOTES
--- --------------
--- This is the brain of autocomplete.
--- Without this, completion is just text matching.
+-- - Configures lua_ls for Neovim API awareness
+-- - Enables intelligent autocomplete
 -- ==========================================================
 
 return {
   {
     "neovim/nvim-lspconfig",
 
-    -- Load when opening files
     event = { "BufReadPre", "BufNewFile" },
 
     dependencies = {
-      -- CMP integration
       "hrsh7th/cmp-nvim-lsp",
 
-      -- Mason (LSP installer)
       {
         "williamboman/mason.nvim",
         cmd = "Mason",
-        config = function()
-          require("mason").setup()
-        end,
+        config = true,
       },
 
-      -- Mason bridge to LSP
       {
         "williamboman/mason-lspconfig.nvim",
-        config = function()
-          require("mason-lspconfig").setup({
-            ensure_installed = {
-              "lua_ls",
-              "bashls",
-            },
-          })
-        end,
+        config = true,
       },
     },
 
     config = function()
       local cmp_lsp = require("cmp_nvim_lsp")
 
-      -- Capabilities for autocomplete
       local capabilities = cmp_lsp.default_capabilities()
 
-      -- Mason handler to auto-configure all servers
+      -- Ensure servers installed
       require("mason-lspconfig").setup({
-        handlers = {
-          function(server)
-            vim.lsp.config(server, {
-              capabilities = capabilities,
-            })
+        ensure_installed = { "lua_ls" },
+      })
 
-            vim.lsp.enable(server)
-          end,
+      -- 🔥 MODERN API (NO lspconfig.setup)
+      vim.lsp.config("lua_ls", {
+        capabilities = capabilities,
+
+        settings = {
+          Lua = {
+            runtime = {
+              version = "LuaJIT",
+            },
+
+            diagnostics = {
+              globals = { "vim" },
+            },
+
+            workspace = {
+              library = vim.api.nvim_get_runtime_file("", true),
+              checkThirdParty = false,
+            },
+
+            telemetry = {
+              enable = false,
+            },
+          },
         },
       })
+
+      vim.lsp.enable("lua_ls")
     end,
   },
 }
