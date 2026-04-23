@@ -2,6 +2,7 @@
   "lazy.nvim": { "branch": "main", "commit": "306a05526ada86a7b30af95c5cc81ffba93fef97" },
   "mini.ai": { "branch": "main", "commit": "43eb2074843950a3a25aae56a5f41362ec043bfa" },
   "mini.comment": { "branch": "main", "commit": "8e5ff3ed3cc0e8f216617aae01020c00c20f7a87" },
+  "mini.pairs": { "branch": "main", "commit": "42387c7fe68fc0b6e95eaf37f1bb76e7bffaa0d9" },
   "mini.surround": { "branch": "main", "commit": "2715e04bea3ec9244f15b421dc5b18c0fe326210" },
   "nvim-tree.lua": { "branch": "master", "commit": "d277467fc0d1d0e2bca88165a1de6b526f9f6fe8" },
   "nvim-treesitter": { "branch": "main", "commit": "4916d6592ede8c07973490d9322f187e07dfefac" },
