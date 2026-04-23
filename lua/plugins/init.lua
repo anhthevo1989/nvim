@@ -78,5 +78,6 @@ require("lazy").setup({
 		-- DEBUGGING
 		-- ------------------------------------------------------
 		{ import = "plugins.debug" },
+		{ import = "plugins.debug.ui" },
 	},
 })
