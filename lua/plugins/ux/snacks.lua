@@ -1,58 +1,53 @@
---[[
-===============================================================================
-FILE: lua/plugins/ux/snacks.lua
-===============================================================================
---]]
+-- ==========================================================
+-- FILE: lua/plugins/ux/snacks.lua
+-- ==========================================================
+-- PURPOSE
+-- -------
+-- Configure Snacks UX layer with unified terminal system
+-- ==========================================================
 
 return {
+	{
+		"folke/snacks.nvim",
 
-  {
-    "folke/snacks.nvim",
+		opts = {
+			picker = { enabled = true },
 
-    lazy = true,
+			terminal = {
+				enabled = true,
+				win = {
+					position = "bottom",
+					height = 0.3,
+				},
+			},
 
-    opts = {
+			notifier = { enabled = true },
+			input = { enabled = true },
+			scope = { enabled = true },
+		},
 
-      picker = { enabled = true },
-      terminal = { enabled = true },
-      input = { enabled = true },
-      notifier = { enabled = true },
+		config = function(_, opts)
+			local snacks = require("snacks")
+			snacks.setup(opts)
 
-      -- --------------------------------------------------
-      -- KEY HINTS
-      -- --------------------------------------------------
+			-- ======================================================
+			-- TERMINAL TOGGLE (BOTTOM SPLIT)
+			-- ======================================================
+			vim.keymap.set("n", "<leader>tt", function()
+				snacks.terminal.toggle()
+			end, { desc = "Toggle Terminal" })
 
-      scope = {
-        enabled = true,
-      },
-
-    },
-
-    config = function(_, opts)
-      local snacks = require("snacks")
-      snacks.setup(opts)
-
-      -- UI overrides (temporary until Noice)
-      vim.ui.input = snacks.input
-      vim.ui.select = snacks.select
-    end,
-
-    keys = {
-
-      -- FILE SEARCH
-      { "<leader>ff", function() require("snacks").picker.files() end, desc = "Find files" },
-
-      -- GREP
-      { "<leader>fg", function() require("snacks").picker.grep() end, desc = "Grep search" },
-
-      -- BUFFERS
-      { "<leader>fb", function() require("snacks").picker.buffers() end, desc = "Find buffers" },
-
-      -- TERMINAL
-      { "<leader>tt", function() require("snacks").terminal.toggle() end, desc = "Toggle terminal" },
-
-    },
-
-  },
-
+			-- ======================================================
+			-- LAZYGIT IN TERMINAL (FORCED SPLIT)
+			-- ======================================================
+			vim.keymap.set("n", "<leader>gg", function()
+				snacks.terminal.open("lazygit", {
+					win = {
+						position = "bottom",
+						height = 0.3,
+					},
+				})
+			end, { desc = "LazyGit (terminal split)" })
+		end,
+	},
 }
