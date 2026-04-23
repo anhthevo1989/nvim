@@ -79,5 +79,6 @@ require("lazy").setup({
 		-- ------------------------------------------------------
 		{ import = "plugins.debug" },
 		{ import = "plugins.debug.ui" },
+		{ import = "plugins.debug.virtual_text" },
 	},
 })
