@@ -1,33 +1,31 @@
 --[[
 ===============================================================================
-FILE: lua/plugins/editing/mini-ai.lua
+FILE: lua/plugins/editing/init.lua
 ===============================================================================
 
 PURPOSE
 -------
-Enhance text objects for smarter editing.
-
-WHAT IT DOES
-------------
-- Improves "inside" and "around" selections
-- Makes editing more intuitive and powerful
-
-EXAMPLES
---------
-ci"   → change inside quotes
-da(   → delete around parentheses
-vi{   → select inside braces
+Load all editing-related plugins.
 
 ===============================================================================
 --]]
 
 return {
+
   {
     "echasnovski/mini.ai",
     version = false,
-    event = "VeryLazy",
     config = function()
       require("mini.ai").setup()
     end,
   },
+
+  {
+    "echasnovski/mini.surround",
+    version = false,
+    config = function()
+      require("mini.surround").setup()
+    end,
+  },
+
 }

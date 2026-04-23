@@ -1,33 +1,33 @@
 --[[
 ===============================================================================
-FILE: lua/plugins/editing/mini-ai.lua
+FILE: lua/plugins/editing/mini-surround.lua
 ===============================================================================
 
 PURPOSE
 -------
-Enhance text objects for smarter editing.
+Enable fast manipulation of surrounding characters.
 
 WHAT IT DOES
 ------------
-- Improves "inside" and "around" selections
-- Makes editing more intuitive and powerful
+- Add, change, delete surrounding pairs
+- Works with quotes, brackets, tags, etc.
 
 EXAMPLES
 --------
-ci"   → change inside quotes
-da(   → delete around parentheses
-vi{   → select inside braces
+ysiw"   → "word"
+cs"'    → "word" → 'word'
+ds"     → "word" → word
 
 ===============================================================================
 --]]
 
 return {
   {
-    "echasnovski/mini.ai",
+    "echasnovski/mini.surround",
     version = false,
     event = "VeryLazy",
     config = function()
-      require("mini.ai").setup()
+      require("mini.surround").setup()
     end,
   },
 }
