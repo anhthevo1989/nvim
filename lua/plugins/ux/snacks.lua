@@ -5,32 +5,20 @@ FILE: lua/plugins/ux/snacks.lua
 
 PURPOSE
 -------
-Configure Snacks UX system (picker + terminal).
+Configure Snacks UX system (core modules).
 
-WHY THIS FILE EXISTS
---------------------
-- Enables fuzzy finder (picker)
-- Adds integrated terminal
-- Builds core UX layer
+ENABLED MODULES
+---------------
+- picker (file/search navigation)
+- terminal (integrated shell)
+- input (UI prompts)
+- notifier (notifications)
 
-HOW IT WORKS
-------------
-- Snacks loads modules via opts
-- Picker handles navigation
-- Terminal provides shell inside Neovim
-
-FLOW
-----
-plugins/init.lua
-  → plugins.ux
-      → snacks.lua
-          → enables picker + terminal
-
-BEGINNER NOTES
---------------
-- Only picker + terminal enabled
-- Other modules added later
-- Keep configuration minimal
+NOTES
+-----
+- This builds the full UX foundation
+- Noice will later take over advanced UI
+- Keep config minimal for now
 
 ===============================================================================
 --]]
@@ -44,73 +32,31 @@ return {
 
     opts = {
 
-      -- --------------------------------------------------
-      -- PICKER
-      -- --------------------------------------------------
-
-      picker = {
-        enabled = true,
-      },
-
-      -- --------------------------------------------------
-      -- TERMINAL
-      -- --------------------------------------------------
-
-      terminal = {
-        enabled = true,
-      },
+      picker = { enabled = true },
+      terminal = { enabled = true },
+      input = { enabled = true },
+      notifier = { enabled = true },
 
     },
 
+    config = function(_, opts)
+      local snacks = require("snacks")
+      snacks.setup(opts)
+
+      -- ===================================================
+      -- FORCE SNACKS TO HANDLE INPUT + SELECT
+      -- ===================================================
+
+      vim.ui.input = snacks.input
+      vim.ui.select = snacks.select
+    end,
+
     keys = {
 
-      -- --------------------------------------------------
-      -- FILE SEARCH
-      -- --------------------------------------------------
-
-      {
-        "<leader>ff",
-        function()
-          require("snacks").picker.files()
-        end,
-        desc = "Find files",
-      },
-
-      -- --------------------------------------------------
-      -- GREP SEARCH
-      -- --------------------------------------------------
-
-      {
-        "<leader>fg",
-        function()
-          require("snacks").picker.grep()
-        end,
-        desc = "Grep search",
-      },
-
-      -- --------------------------------------------------
-      -- BUFFERS
-      -- --------------------------------------------------
-
-      {
-        "<leader>fb",
-        function()
-          require("snacks").picker.buffers()
-        end,
-        desc = "Find buffers",
-      },
-
-      -- --------------------------------------------------
-      -- TERMINAL TOGGLE
-      -- --------------------------------------------------
-
-      {
-        "<leader>tt",
-        function()
-          require("snacks").terminal.toggle()
-        end,
-        desc = "Toggle terminal",
-      },
+      { "<leader>ff", function() require("snacks").picker.files() end, desc = "Find files" },
+      { "<leader>fg", function() require("snacks").picker.grep() end, desc = "Grep search" },
+      { "<leader>fb", function() require("snacks").picker.buffers() end, desc = "Find buffers" },
+      { "<leader>tt", function() require("snacks").terminal.toggle() end, desc = "Toggle terminal" },
 
     },
 
