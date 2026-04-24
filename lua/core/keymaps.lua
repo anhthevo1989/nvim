@@ -1,42 +1,32 @@
 -- ==========================================================
+-- FILE: lua/core/keymaps.lua
+-- ==========================================================
 -- PURPOSE
--- Define global keybindings
---
--- WHY IT EXISTS
--- Centralized interaction system
---
--- FLOW
--- Loads submodules for specific systems
+-- -------
+-- Define core keymaps for Neovim configuration
 -- ==========================================================
 
-local map = vim.keymap.set
-
--- ----------------------------------------------------------
--- WINDOW NAVIGATION
--- ----------------------------------------------------------
-
-map("n", "<C-h>", "<C-w>h")
-map("n", "<C-l>", "<C-w>l")
-map("n", "<C-j>", "<C-w>j")
-map("n", "<C-k>", "<C-w>k")
-
--- ----------------------------------------------------------
--- SEARCH
--- ----------------------------------------------------------
-
-map("n", "<Esc>", "<cmd>nohlsearch<CR>")
-
--- ----------------------------------------------------------
--- FILE CONTROL
--- ----------------------------------------------------------
-
-map("n", "<leader>w", "<cmd>w<CR>")
-map("n", "<leader>q", "<cmd>q<CR>")
+local keymap = vim.keymap.set
 
 -- ==========================================================
--- LOAD SYSTEM KEYMAPS
+-- EXPLORER
 -- ==========================================================
 
-require("core.keymaps.lsp")
-require("core.keymaps.dap")
-require("core.keymaps.run")
+keymap("n", "<leader>ex", function()
+	local ok, api = pcall(require, "nvim-tree.api")
+
+	if ok then
+		api.tree.focus()
+	else
+		vim.notify("nvim-tree not available", vim.log.levels.WARN)
+	end
+end, { desc = "Explorer Focus" })
+
+-- ==========================================================
+-- TERMINAL
+-- ==========================================================
+
+-- Exit terminal mode
+keymap("t", "<Esc><Esc>", [[<C-\><C-n>]], {
+	desc = "Exit Terminal Mode",
+})
