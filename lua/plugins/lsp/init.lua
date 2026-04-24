@@ -3,74 +3,42 @@
 -- ==========================================================
 -- PURPOSE
 -- -------
--- Language Server Protocol (LSP) setup
+-- Configure LSP servers
 --
--- WHAT THIS DOES
--- --------------
--- - Installs LSP servers via Mason
--- - Connects LSP to nvim-cmp
--- - Configures lua_ls for Neovim API awareness
--- - Enables intelligent autocomplete
+-- SERVERS
+-- -------
+-- - lua_ls   → Lua
+-- - bashls   → Shell
+-- - pyright  → Python
 -- ==========================================================
 
 return {
-  {
-    "neovim/nvim-lspconfig",
+	"neovim/nvim-lspconfig",
 
-    event = { "BufReadPre", "BufNewFile" },
+	config = function()
+		local lspconfig = require("lspconfig")
 
-    dependencies = {
-      "hrsh7th/cmp-nvim-lsp",
+		-- ------------------------------------------------------
+		-- LUA
+		-- ------------------------------------------------------
+		lspconfig.lua_ls.setup({
+			settings = {
+				Lua = {
+					diagnostics = {
+						globals = { "vim" },
+					},
+				},
+			},
+		})
 
-      {
-        "williamboman/mason.nvim",
-        cmd = "Mason",
-        config = true,
-      },
+		-- ------------------------------------------------------
+		-- BASH
+		-- ------------------------------------------------------
+		lspconfig.bashls.setup({})
 
-      {
-        "williamboman/mason-lspconfig.nvim",
-        config = true,
-      },
-    },
-
-    config = function()
-      local cmp_lsp = require("cmp_nvim_lsp")
-
-      local capabilities = cmp_lsp.default_capabilities()
-
-      -- Ensure servers installed
-      require("mason-lspconfig").setup({
-        ensure_installed = { "lua_ls" },
-      })
-
-      -- 🔥 MODERN API (NO lspconfig.setup)
-      vim.lsp.config("lua_ls", {
-        capabilities = capabilities,
-
-        settings = {
-          Lua = {
-            runtime = {
-              version = "LuaJIT",
-            },
-
-            diagnostics = {
-              globals = { "vim" },
-            },
-
-            workspace = {
-              library = vim.api.nvim_get_runtime_file("", true),
-              checkThirdParty = false,
-            },
-
-            telemetry = {
-              enable = false,
-            },
-          },
-        },
-      })
-
-      vim.lsp.enable("lua_ls")
-    end,
-  },
+		-- ------------------------------------------------------
+		-- PYTHON (PYRIGHT)
+		-- ------------------------------------------------------
+		lspconfig.pyright.setup({})
+	end,
 }
