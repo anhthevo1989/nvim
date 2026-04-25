@@ -3,52 +3,97 @@
 -- ==========================================================
 -- PURPOSE
 -- -------
--- Run current file based on filetype
+-- Run current file in the betterTerm Run tab.
 --
--- SUPPORTED
--- ---------
--- - lua
--- - python
--- - sh / bash
+-- WHY IT EXISTS
+-- -------------
+-- One-key run should always send output to the dedicated Run tab.
+-- It should not spawn random terminal buffers.
 --
--- NOTES
--- -----
--- Keeps terminal open after execution so output is visible
+-- HOW IT WORKS
+-- ------------
+-- Detects the current filetype.
+-- Builds the matching run command.
+-- Opens betterTerm tab 1.
+-- Sends the command there.
+--
+-- FLOW
+-- ----
+-- 1. User presses <leader>r.
+-- 2. Current filetype is detected.
+-- 3. Run command is sent to betterTerm Run tab.
+-- 4. Output stays visible until Enter is pressed.
+--
+-- BEGINNER NOTES
+-- --------------
+-- betterTerm tab 1 is the Run tab.
+-- This file should not call Snacks terminal.
 -- ==========================================================
 
 local M = {}
 
+local function quote_file_path(file_path)
+	return vim.fn.shellescape(file_path)
+end
+
+local function get_pause_command()
+	local shell = vim.o.shell
+
+	if shell:find("fish") then
+		return "echo; read -P 'Press enter to continue'"
+	end
+
+	return "echo; read -r -p 'Press enter to continue'"
+end
+
+local function get_run_command()
+	local filetype = vim.bo.filetype
+	local file_path = vim.fn.expand("%:p")
+
+	if file_path == "" then
+		return nil
+	end
+
+	local quoted_file_path = quote_file_path(file_path)
+
+	if filetype == "lua" then
+		return "lua " .. quoted_file_path
+	end
+
+	if filetype == "python" then
+		return "python " .. quoted_file_path
+	end
+
+	if filetype == "sh" or filetype == "bash" then
+		return "bash " .. quoted_file_path
+	end
+
+	if filetype == "javascript" then
+		return "node " .. quoted_file_path
+	end
+
+	return nil
+end
+
 function M.run()
-	local ft = vim.bo.filetype
-	local file = vim.fn.expand("%")
+	local ok, better_term = pcall(require, "betterTerm")
 
-	if file == "" then
-		vim.notify("No file to run", vim.log.levels.WARN)
+	if not ok then
+		vim.notify("betterTerm is not available", vim.log.levels.ERROR)
 		return
 	end
 
-	local shell_cmd = nil
+	local run_command = get_run_command()
 
-	if ft == "lua" then
-		shell_cmd = "lua " .. file
-	elseif ft == "python" then
-		shell_cmd = "python " .. file
-	elseif ft == "sh" or ft == "bash" then
-		shell_cmd = "bash " .. file
-	else
-		vim.notify("No runner for filetype: " .. ft, vim.log.levels.WARN)
+	if not run_command then
+		vim.notify("No runner for filetype: " .. vim.bo.filetype, vim.log.levels.WARN)
 		return
 	end
 
-	-- Wrap command so terminal stays open
-	local cmd = "bash -c '" .. shell_cmd .. '; echo; read -n 1 -s -r -p "Press any key to continue..."\''
+	local command = run_command .. "; " .. get_pause_command()
 
-	require("snacks.terminal").open(cmd, {
-		win = {
-			position = "bottom",
-			height = 0.3,
-		},
-	})
+	better_term.open(1)
+	better_term.send(command, 1)
 end
 
 return M
