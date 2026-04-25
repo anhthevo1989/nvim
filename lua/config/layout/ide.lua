@@ -3,118 +3,83 @@
 -- ==========================================================
 -- PURPOSE
 -- -------
--- Open and control the IDE layout.
---
--- WHY IT EXISTS
--- -------------
--- The dashboard should stay lightweight.
--- Once a project or file is opened, Neovim should become an IDE
--- without manual toggles.
---
--- This file also provides explicit layout controls:
--- - IDE layout
--- - Zen layout
---
--- HOW IT WORKS
--- ------------
--- This module safely controls:
--- - nvim-tree on the left
--- - betterTerm shell terminal on the bottom
---
--- FLOW
--- ----
--- 1. Dashboard opens first.
--- 2. User opens a file or project.
--- 3. This module opens the IDE layout.
--- 4. User can switch between IDE and Zen layouts.
---
--- BEGINNER NOTES
--- --------------
--- betterTerm owns terminal workflow.
--- nvim-tree owns file explorer workflow.
--- This file only decides when those tools are shown or hidden.
+-- Control IDE and Zen layout.
 -- ==========================================================
 
 local M = {}
 
 local layout_has_opened = false
 
+-- ==========================================================
+-- HELPERS
+-- ==========================================================
+
 local function is_real_file_buffer()
-	local buffer_name = vim.api.nvim_buf_get_name(0)
-
-	if buffer_name == "" then
-		return false
-	end
-
-	if vim.bo.buftype ~= "" then
-		return false
-	end
-
-	return true
+	return vim.api.nvim_buf_get_name(0) ~= "" and vim.bo.buftype == ""
 end
+
+local function get_visible_terminal_windows()
+	local terminal_windows = {}
+
+	for _, win in ipairs(vim.api.nvim_list_wins()) do
+		local buf = vim.api.nvim_win_get_buf(win)
+
+		if vim.bo[buf].buftype == "terminal" then
+			table.insert(terminal_windows, win)
+		end
+	end
+
+	return terminal_windows
+end
+
+local function terminal_is_visible()
+	return #get_visible_terminal_windows() > 0
+end
+
+-- ==========================================================
+-- FILE TREE (Neo-tree)
+-- ==========================================================
 
 local function open_file_tree()
-	local ok, nvim_tree_api = pcall(require, "nvim-tree.api")
-
-	if not ok then
-		vim.notify("nvim-tree is not available yet", vim.log.levels.WARN)
-		return
-	end
-
-	nvim_tree_api.tree.open({
-		focus = false,
-	})
-end
-
-local function focus_file_tree()
-	local ok, nvim_tree_api = pcall(require, "nvim-tree.api")
-
-	if not ok then
-		vim.notify("nvim-tree is not available yet", vim.log.levels.WARN)
-		return
-	end
-
-	nvim_tree_api.tree.open()
-	nvim_tree_api.tree.focus()
+	vim.cmd("Neotree reveal left filesystem")
 end
 
 local function close_file_tree()
-	local ok, nvim_tree_api = pcall(require, "nvim-tree.api")
+	vim.cmd("Neotree close")
+end
 
-	if not ok then
+-- ==========================================================
+-- TERMINAL (betterTerm)
+-- ==========================================================
+
+local function open_terminal()
+	if terminal_is_visible() then
 		return
 	end
 
-	nvim_tree_api.tree.close()
-end
-
-local function open_bottom_terminal()
 	local ok, better_term = pcall(require, "betterTerm")
-
 	if not ok then
-		vim.notify("betterTerm is not available yet", vim.log.levels.WARN)
+		vim.notify("betterTerm not available", vim.log.levels.WARN)
 		return
 	end
 
 	better_term.open(0)
 end
 
-local function close_bottom_terminal()
-	local ok, better_term = pcall(require, "betterTerm")
-
-	if not ok then
-		return
+local function close_terminal()
+	for _, win in ipairs(get_visible_terminal_windows()) do
+		if vim.api.nvim_win_is_valid(win) then
+			vim.api.nvim_win_close(win, true)
+		end
 	end
-
-	better_term.toggle_termwindow()
 end
+
+-- ==========================================================
+-- LAYOUT CONTROL
+-- ==========================================================
 
 function M.open()
-	if layout_has_opened then
-		return
-	end
-
-	if not is_real_file_buffer() then
+	if layout_has_opened or not is_real_file_buffer() then
 		return
 	end
 
@@ -122,16 +87,7 @@ function M.open()
 
 	vim.schedule(function()
 		open_file_tree()
-		open_bottom_terminal()
-	end)
-end
-
-function M.force_open()
-	layout_has_opened = true
-
-	vim.schedule(function()
-		open_file_tree()
-		open_bottom_terminal()
+		open_terminal()
 	end)
 end
 
@@ -140,16 +96,20 @@ function M.ide_layout()
 
 	vim.schedule(function()
 		open_file_tree()
-		open_bottom_terminal()
+		open_terminal()
 	end)
 end
 
 function M.zen_layout()
 	vim.schedule(function()
 		close_file_tree()
-		close_bottom_terminal()
+		close_terminal()
 	end)
 end
+
+-- ==========================================================
+-- SETUP
+-- ==========================================================
 
 function M.setup()
 	vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
@@ -159,15 +119,11 @@ function M.setup()
 		end,
 	})
 
-	vim.keymap.set("n", "<leader>li", function()
-		M.ide_layout()
-	end, {
+	vim.keymap.set("n", "<leader>li", M.ide_layout, {
 		desc = "IDE Layout",
 	})
 
-	vim.keymap.set("n", "<leader>lz", function()
-		M.zen_layout()
-	end, {
+	vim.keymap.set("n", "<leader>lz", M.zen_layout, {
 		desc = "Zen Layout",
 	})
 end
