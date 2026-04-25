@@ -19,11 +19,11 @@
 -- ----
 -- 1. Snacks plugin loads.
 -- 2. snacks.setup() runs.
--- 3. This file registers picker, terminal, and lazygit mappings.
+-- 3. This file registers picker mappings.
 --
 -- BEGINNER NOTES
 -- --------------
--- Add future Snacks keymaps here, not in the plugin spec.
+-- Terminal mappings are now handled by ToggleTerm.
 -- ==========================================================
 
 local M = {}
@@ -37,18 +37,13 @@ function M.setup(snacks)
 		snacks.picker.grep()
 	end, { desc = "Find Text" })
 
-	vim.keymap.set("n", "<leader>tt", function()
-		snacks.terminal.toggle()
-	end, { desc = "Toggle Terminal" })
+	vim.keymap.set("n", "<leader>fb", function()
+		snacks.picker.buffers()
+	end, { desc = "Find Buffers" })
 
-	vim.keymap.set("n", "<leader>gg", function()
-		snacks.terminal.open("lazygit", {
-			win = {
-				position = "bottom",
-				height = 0.3,
-			},
-		})
-	end, { desc = "LazyGit (terminal split)" })
+	vim.keymap.set("n", "<leader>fh", function()
+		snacks.picker.help()
+	end, { desc = "Find Help" })
 end
 
 return M

@@ -59,7 +59,7 @@ return {
 			bottom = {
 				{
 					title = "Terminal",
-					ft = "snacks_terminal",
+					ft = "toggleterm",
 					size = { height = 0.3 },
 					filter = function(_, win)
 						return vim.api.nvim_win_get_config(win).relative == ""
