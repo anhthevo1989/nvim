@@ -14,16 +14,31 @@
 -- NOTES
 -- -----
 -- Uses vim.lsp.config instead of deprecated lspconfig.setup
+-- Adds nvim-cmp capabilities so LSP completion works.
 -- ==========================================================
 
 return {
 	"neovim/nvim-lspconfig",
 
+	dependencies = {
+		"hrsh7th/cmp-nvim-lsp",
+	},
+
 	config = function()
+		local capabilities = vim.lsp.protocol.make_client_capabilities()
+
+		local ok, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
+
+		if ok then
+			capabilities = cmp_nvim_lsp.default_capabilities(capabilities)
+		end
+
 		-- ======================================================
 		-- LUA
 		-- ======================================================
 		vim.lsp.config("lua_ls", {
+			capabilities = capabilities,
+
 			settings = {
 				Lua = {
 					diagnostics = {
@@ -36,12 +51,16 @@ return {
 		-- ======================================================
 		-- BASH
 		-- ======================================================
-		vim.lsp.config("bashls", {})
+		vim.lsp.config("bashls", {
+			capabilities = capabilities,
+		})
 
 		-- ======================================================
 		-- PYTHON
 		-- ======================================================
-		vim.lsp.config("pyright", {})
+		vim.lsp.config("pyright", {
+			capabilities = capabilities,
+		})
 
 		-- ======================================================
 		-- ENABLE SERVERS

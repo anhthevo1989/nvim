@@ -3,51 +3,94 @@
 -- ==========================================================
 -- PURPOSE
 -- -------
--- Completion system with LSP + snippets
+-- Configure completion system.
 --
--- WHAT THIS DOES
--- --------------
--- - Provides autocomplete UI (nvim-cmp)
--- - Integrates LSP suggestions
--- - Adds snippet support (LuaSnip)
--- - Prioritizes intelligent suggestions over buffer text
+-- WHY IT EXISTS
+-- -------------
+-- nvim-cmp provides completion UI.
+-- cmp-nvim-lsp connects completion to LSP servers.
+-- buffer/path sources provide fallback suggestions.
+--
+-- HOW IT WORKS
+-- ------------
+-- Completion is loaded eagerly to avoid lazy-load race conditions.
+-- This guarantees cmp sources are registered before InsertEnter.
+--
+-- FLOW
+-- ----
+-- 1. Neovim starts.
+-- 2. nvim-cmp and sources load.
+-- 3. Completion sources are registered.
+-- 4. Insert mode suggestions work consistently.
 --
 -- BEGINNER NOTES
 -- --------------
--- This file controls how autocomplete behaves.
--- Order of sources = importance.
+-- Reliability first.
+-- We can optimize lazy-loading later if needed.
+-- :CmpStatus should show nvim_lsp, path, and buffer.
 -- ==========================================================
 
 return {
-  {
-    "hrsh7th/nvim-cmp",
-    event = "InsertEnter",
+	{
+		"hrsh7th/nvim-cmp",
 
-    dependencies = {
-      "hrsh7th/cmp-nvim-lsp",
-      "hrsh7th/cmp-buffer",
-    },
+		lazy = false,
 
-    config = function()
-      local cmp = require("cmp")
+		dependencies = {
+			{
+				"hrsh7th/cmp-nvim-lsp",
+				lazy = false,
+			},
+			{
+				"hrsh7th/cmp-buffer",
+				lazy = false,
+			},
+			{
+				"hrsh7th/cmp-path",
+				lazy = false,
+			},
+		},
 
-      cmp.setup({
+		config = function()
+			local cmp = require("cmp")
 
-        -- 🔥 THIS IS THE KEY FIX
-        completion = {
-          autocomplete = { require("cmp.types").cmp.TriggerEvent.TextChanged },
-        },
+			cmp.setup({
+				completion = {
+					completeopt = "menu,menuone,noinsert",
+				},
 
-        mapping = cmp.mapping.preset.insert({
-          ["<C-Space>"] = cmp.mapping.complete(),
-        }),
+				mapping = cmp.mapping.preset.insert({
+					["<C-Space>"] = cmp.mapping.complete(),
 
-        sources = {
-          { name = "nvim_lsp" },
-          { name = "buffer" },
-        },
+					["<CR>"] = cmp.mapping.confirm({
+						select = true,
+					}),
 
-      })
-    end,
-  },
+					["<Tab>"] = cmp.mapping(function(fallback)
+						if cmp.visible() then
+							cmp.select_next_item()
+						else
+							fallback()
+						end
+					end, { "i", "s" }),
+
+					["<S-Tab>"] = cmp.mapping(function(fallback)
+						if cmp.visible() then
+							cmp.select_prev_item()
+						else
+							fallback()
+						end
+					end, { "i", "s" }),
+
+					["<C-e>"] = cmp.mapping.abort(),
+				}),
+
+				sources = cmp.config.sources({
+					{ name = "nvim_lsp" },
+					{ name = "path" },
+					{ name = "buffer" },
+				}),
+			})
+		end,
+	},
 }
