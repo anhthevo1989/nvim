@@ -1,26 +1,134 @@
 -- ==========================================================
--- LSP KEYMAPS
+-- FILE: lua/core/keymaps/lsp.lua
+-- ==========================================================
+-- PURPOSE
+-- -------
+-- Define LSP keymaps.
+--
+-- WHY IT EXISTS
+-- -------------
+-- LSP keymaps should only exist when an LSP server is attached.
+--
+-- HOW IT WORKS
+-- ------------
+-- Uses LspAttach to register buffer-local mappings.
+--
+-- BEGINNER NOTES
+-- --------------
+-- <leader>r = run / refactor namespace
 -- ==========================================================
 
-local map = vim.keymap.set
+local keymap = vim.keymap.set
 
 vim.api.nvim_create_autocmd("LspAttach", {
+	group = vim.api.nvim_create_augroup("LspKeymaps", { clear = true }),
+
 	callback = function(args)
-		local opts = { buffer = args.buf }
+		local opts = {
+			buffer = args.buf,
+			silent = true,
+		}
 
-		-- ------------------------------------------------------
+		-- ======================================================
+		-- REFACTOR
+		-- ======================================================
+
+		keymap(
+			"n",
+			"<leader>rn",
+			vim.lsp.buf.rename,
+			vim.tbl_extend("force", opts, {
+				desc = "Rename Symbol",
+			})
+		)
+
+		keymap(
+			{ "n", "v" },
+			"<leader>ra",
+			vim.lsp.buf.code_action,
+			vim.tbl_extend("force", opts, {
+				desc = "Code Action",
+			})
+		)
+
+		-- ======================================================
 		-- NAVIGATION
-		-- ------------------------------------------------------
+		-- ======================================================
 
-		map("n", "gd", vim.lsp.buf.definition, opts)
-		map("n", "gr", vim.lsp.buf.references, opts)
-		map("n", "K", vim.lsp.buf.hover, opts)
+		keymap(
+			"n",
+			"gd",
+			vim.lsp.buf.definition,
+			vim.tbl_extend("force", opts, {
+				desc = "Go to Definition",
+			})
+		)
 
-		-- ------------------------------------------------------
-		-- ACTIONS
-		-- ------------------------------------------------------
+		keymap(
+			"n",
+			"gr",
+			vim.lsp.buf.references,
+			vim.tbl_extend("force", opts, {
+				desc = "References",
+			})
+		)
 
-		map("n", "<leader>rn", vim.lsp.buf.rename, opts)
-		map("n", "<leader>ca", vim.lsp.buf.code_action, opts)
+		keymap(
+			"n",
+			"gi",
+			vim.lsp.buf.implementation,
+			vim.tbl_extend("force", opts, {
+				desc = "Go to Implementation",
+			})
+		)
+
+		keymap(
+			"n",
+			"gD",
+			vim.lsp.buf.declaration,
+			vim.tbl_extend("force", opts, {
+				desc = "Go to Declaration",
+			})
+		)
+
+		-- ======================================================
+		-- INFO
+		-- ======================================================
+
+		keymap(
+			"n",
+			"K",
+			vim.lsp.buf.hover,
+			vim.tbl_extend("force", opts, {
+				desc = "Hover",
+			})
+		)
+
+		keymap(
+			"n",
+			"<leader>ld",
+			vim.diagnostic.open_float,
+			vim.tbl_extend("force", opts, {
+				desc = "Line Diagnostics",
+			})
+		)
+
+		keymap(
+			"n",
+			"[d",
+			vim.diagnostic.goto_prev,
+			vim.tbl_extend("force", opts, {
+				desc = "Prev Diagnostic",
+			})
+		)
+
+		keymap(
+			"n",
+			"]d",
+			vim.diagnostic.goto_next,
+			vim.tbl_extend("force", opts, {
+				desc = "Next Diagnostic",
+			})
+		)
 	end,
 })
