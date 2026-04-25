@@ -37,14 +37,6 @@ function M.get_options()
 		input = { enabled = true },
 		scope = { enabled = true },
 
-		terminal = {
-			enabled = true,
-			win = {
-				position = "bottom",
-				height = 0.3,
-			},
-		},
-
 		dashboard = {
 			enabled = true,
 
@@ -64,6 +56,12 @@ function M.get_options()
 						key = "p",
 						desc = "[ PROJECTS ]",
 						action = projects.open_project_picker,
+					},
+					{
+						icon = " ",
+						key = "e",
+						desc = "[ EXPLORER ]",
+						action = ":lua Snacks.picker.files()",
 					},
 					{
 						icon = " ",
