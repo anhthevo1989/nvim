@@ -15,7 +15,7 @@
 -- ------------
 -- This module safely opens:
 -- - nvim-tree on the left
--- - Snacks terminal on the bottom
+-- - betterTerm shell terminal on the bottom
 --
 -- FLOW
 -- ----
@@ -26,8 +26,8 @@
 --
 -- BEGINNER NOTES
 -- --------------
--- Do not call :NvimTreeOpen directly here.
--- Use nvim-tree's Lua API so lazy-loaded commands do not break startup.
+-- betterTerm owns terminal workflow.
+-- This file only asks betterTerm to open the shell terminal.
 -- ==========================================================
 
 local M = {}
@@ -62,17 +62,14 @@ local function open_file_tree()
 end
 
 local function open_bottom_terminal()
-	if not Snacks or not Snacks.terminal then
-		vim.notify("Snacks terminal is not available yet", vim.log.levels.WARN)
+	local ok, better_term = pcall(require, "betterTerm")
+
+	if not ok then
+		vim.notify("betterTerm is not available yet", vim.log.levels.WARN)
 		return
 	end
 
-	Snacks.terminal.open(nil, {
-		win = {
-			position = "bottom",
-			height = 0.3,
-		},
-	})
+	better_term.open(0)
 end
 
 function M.open()
