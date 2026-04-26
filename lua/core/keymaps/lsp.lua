@@ -130,5 +130,34 @@ vim.api.nvim_create_autocmd("LspAttach", {
 				desc = "Next Diagnostic",
 			})
 		)
+
+		-- ==========================================================
+		-- DIAGNOSTICS KEYMAPS
+		-- ==========================================================
+		-- PURPOSE
+		-- -------
+		-- Provide quick access to diagnostics without clutter.
+
+		-- ==========================================================
+
+		-- show diagnostics for current line
+		vim.keymap.set("n", "<leader>dd", vim.diagnostic.open_float, {
+			desc = "Diagnostics: Show line",
+		})
+
+		-- toggle virtual text
+		local diagnostics_virtual_text = false
+
+		vim.keymap.set("n", "<leader>dt", function()
+			diagnostics_virtual_text = not diagnostics_virtual_text
+
+			vim.diagnostic.config({
+				virtual_text = diagnostics_virtual_text,
+			})
+
+			vim.notify("Diagnostics virtual text: " .. (diagnostics_virtual_text and "ON" or "OFF"))
+		end, {
+			desc = "Diagnostics: Toggle virtual text",
+		})
 	end,
 })
