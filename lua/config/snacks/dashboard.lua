@@ -67,7 +67,14 @@ function M.get_options()
 						icon = " ",
 						key = "n",
 						desc = "[ NEW FILE ]",
-						action = ":ene | startinsert",
+						action = function()
+							vim.cmd("ene")
+
+							vim.schedule(function()
+								require("config.layout.ide").ide_layout()
+								vim.cmd("startinsert")
+							end)
+						end,
 					},
 					{
 						icon = " ",
