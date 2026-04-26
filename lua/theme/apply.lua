@@ -113,6 +113,41 @@ function M.apply(theme_name)
 	set("PmenuSel", { fg = theme.bg, bg = theme.accent.blue })
 	set("PmenuSbar", { bg = theme.bg_alt })
 	set("PmenuThumb", { bg = theme.border })
+
+	-- ======================================================
+	-- BARBAR (ACTIVE = CYAN TEXT)
+	-- ======================================================
+
+	set("BufferCurrent", {
+		fg = theme.accent.cyan,
+		bg = theme.bg,
+		bold = true,
+	})
+
+	set("BufferCurrentMod", {
+		fg = theme.accent.orange,
+		bg = theme.bg,
+	})
+
+	set("BufferCurrentSign", {
+		fg = theme.accent.cyan,
+		bg = theme.bg,
+	})
+
+	set("BufferInactive", {
+		fg = theme.fg_dark,
+		bg = theme.bg,
+	})
+
+	set("BufferInactiveMod", {
+		fg = theme.accent.orange,
+		bg = theme.bg,
+	})
+
+	set("BufferInactiveSign", {
+		fg = theme.border,
+		bg = theme.bg,
+	})
 end
 
 function M.current()
