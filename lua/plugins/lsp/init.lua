@@ -141,6 +141,34 @@ return {
 		-- PYTHON
 		-- ======================================================
 
+		local python_root = get_root({
+			"pyrightconfig.json",
+			"pyproject.toml",
+			"setup.py",
+			"setup.cfg",
+			"requirements.txt",
+			"Pipfile",
+			".git",
+		})
+
+		local python_venv = find_python_venv(python_root)
+
+		local python_settings = {
+			python = {
+				analysis = {
+					autoSearchPaths = true,
+					diagnosticMode = "openFilesOnly",
+					useLibraryCodeForTypes = true,
+				},
+			},
+		}
+
+		if python_venv then
+			python_settings.python.pythonPath = python_venv.python
+			python_settings.python.venvPath = python_root
+			python_settings.python.venv = python_venv.name
+		end
+
 		vim.lsp.config("pyright", {
 			cmd = { "pyright-langserver", "--stdio" },
 			filetypes = { "python" },
@@ -154,32 +182,7 @@ return {
 				".git",
 			},
 			capabilities = capabilities,
-
-			before_init = function(_, config)
-				local root = get_root(config.root_markers)
-				local venv = find_python_venv(root)
-
-				if not venv then
-					return
-				end
-
-				config.settings = config.settings or {}
-				config.settings.python = config.settings.python or {}
-
-				config.settings.python.pythonPath = venv.python
-				config.settings.python.venvPath = root
-				config.settings.python.venv = venv.name
-			end,
-
-			settings = {
-				python = {
-					analysis = {
-						autoSearchPaths = true,
-						diagnosticMode = "openFilesOnly",
-						useLibraryCodeForTypes = true,
-					},
-				},
-			},
+			settings = python_settings,
 		})
 
 		-- ======================================================
