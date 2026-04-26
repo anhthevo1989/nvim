@@ -195,6 +195,32 @@ function M.apply(theme_name)
 	set("CmpItemKind", {
 		fg = theme.accent.blue,
 	})
+
+	-- ======================================================
+	-- DAP UI (POLISH)
+	-- ======================================================
+
+	set("DapUIVariable", { fg = theme.fg })
+	set("DapUIScope", { fg = theme.accent.cyan })
+	set("DapUIType", { fg = theme.accent.purple })
+	set("DapUIValue", { fg = theme.accent.green })
+
+	set("DapUIThread", { fg = theme.fg })
+	set("DapUIStoppedThread", { fg = theme.accent.yellow })
+
+	set("DapUIFrameName", { fg = theme.fg })
+	set("DapUISource", { fg = theme.accent.blue })
+
+	set("DapUILineNumber", { fg = theme.accent.yellow })
+
+	set("DapUIBreakpointsPath", { fg = theme.accent.blue })
+	set("DapUIBreakpointsInfo", { fg = theme.accent.green })
+	set("DapUIBreakpointsCurrentLine", { fg = theme.accent.cyan, bold = true })
+
+	set("DapUIFloatBorder", { fg = theme.border, bg = theme.float_bg })
+	set("DapUIWatchesEmpty", { fg = theme.diag.warn })
+	set("DapUIWatchesValue", { fg = theme.accent.green })
+	set("DapUIWatchesError", { fg = theme.diag.error })
 end
 
 function M.current()
