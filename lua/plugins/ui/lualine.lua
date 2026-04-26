@@ -3,138 +3,85 @@
 -- ==========================================================
 -- PURPOSE
 -- -------
--- Configure the Neovim statusline.
---
--- WHY IT EXISTS
--- -------------
--- Lualine gives the editor a clear bottom statusline showing
--- useful context such as mode, branch, file name, diagnostics,
--- file type, progress, and cursor location.
---
--- HOW IT WORKS
--- ------------
--- lazy.nvim installs and loads lualine.nvim.
--- lualine.setup() defines what appears in each statusline section.
---
--- FLOW
--- ----
--- 1. Neovim starts.
--- 2. lazy.nvim loads lualine.
--- 3. Lualine renders the bottom statusline.
--- 4. The editor shows current mode, file, git, diagnostics, and position.
---
--- BEGINNER NOTES
--- --------------
--- This file only controls the statusline.
--- Do not put tabline, notifications, command UI, or dashboard logic here.
+-- Statusline styled with Pulse theme
 -- ==========================================================
 
 return {
-	{
-		"nvim-lualine/lualine.nvim",
+	"nvim-lualine/lualine.nvim",
 
-		event = "VeryLazy",
+	event = "VeryLazy",
 
-		dependencies = {
-			"nvim-tree/nvim-web-devicons",
-		},
+	dependencies = {
+		"nvim-tree/nvim-web-devicons",
+	},
 
-		opts = {
+	config = function()
+		local theme = require("theme.dark").get()
+
+		local colors = {
+			bg = theme.bg,
+			bg_alt = theme.bg_alt,
+			fg = theme.fg,
+			fg_dim = theme.fg_dark,
+
+			blue = theme.accent.blue,
+			cyan = theme.accent.cyan,
+			green = theme.accent.green,
+			yellow = theme.accent.yellow,
+			orange = theme.accent.orange,
+			purple = theme.accent.purple,
+			red = theme.diag.error,
+		}
+
+		require("lualine").setup({
 			options = {
-				icons_enabled = true,
-				theme = "auto",
-				component_separators = {
-					left = "",
-					right = "",
-				},
-				section_separators = {
-					left = "",
-					right = "",
-				},
-				disabled_filetypes = {
-					statusline = {
-						"dashboard",
-						"snacks_dashboard",
-						"NvimTree",
+				theme = {
+					normal = {
+						a = { fg = colors.bg, bg = colors.blue, gui = "bold" },
+						b = { fg = colors.fg, bg = colors.bg_alt },
+						c = { fg = colors.fg_dim, bg = colors.bg },
 					},
-					winbar = {},
+					insert = {
+						a = { fg = colors.bg, bg = colors.green, gui = "bold" },
+					},
+					visual = {
+						a = { fg = colors.bg, bg = colors.purple, gui = "bold" },
+					},
+					replace = {
+						a = { fg = colors.bg, bg = colors.red, gui = "bold" },
+					},
+					command = {
+						a = { fg = colors.bg, bg = colors.yellow, gui = "bold" },
+					},
+					inactive = {
+						a = { fg = colors.fg_dim, bg = colors.bg },
+						b = { fg = colors.fg_dim, bg = colors.bg },
+						c = { fg = colors.fg_dim, bg = colors.bg },
+					},
 				},
-				always_divide_middle = true,
+
 				globalstatus = true,
+				component_separators = { left = "│", right = "│" },
+				section_separators = { left = "", right = "" },
 			},
 
 			sections = {
-				lualine_a = {
-					"mode",
-				},
-
-				lualine_b = {
-					"branch",
-					"diff",
-				},
-
-				lualine_c = {
-					{
-						"filename",
-						path = 1,
-						symbols = {
-							modified = " ●",
-							readonly = " ",
-							unnamed = "[No Name]",
-							newfile = "[New]",
-						},
-					},
-				},
-
-				lualine_x = {
-					{
-						"diagnostics",
-						sources = {
-							"nvim_diagnostic",
-						},
-						symbols = {
-							error = " ",
-							warn = " ",
-							info = " ",
-							hint = "󰌵 ",
-						},
-					},
-					"encoding",
-					"filetype",
-				},
-
-				lualine_y = {
-					"progress",
-				},
-
-				lualine_z = {
-					"location",
-				},
+				lualine_a = { "mode" },
+				lualine_b = { "branch", "diff" },
+				lualine_c = { "filename" },
+				lualine_x = { "encoding", "filetype" },
+				lualine_y = { "progress" },
+				lualine_z = { "location" },
 			},
 
 			inactive_sections = {
 				lualine_a = {},
 				lualine_b = {},
-				lualine_c = {
-					"filename",
-				},
-				lualine_x = {
-					"location",
-				},
+				lualine_c = { "filename" },
+				lualine_x = { "location" },
 				lualine_y = {},
 				lualine_z = {},
 			},
-
-			tabline = {},
-
-			winbar = {},
-
-			inactive_winbar = {},
-
-			extensions = {
-				"nvim-tree",
-				"lazy",
-			},
-		},
-	},
+		})
+	end,
 }
