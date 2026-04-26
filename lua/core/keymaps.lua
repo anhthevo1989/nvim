@@ -162,6 +162,25 @@ end, {
 })
 
 -- ==========================================================
+-- TRANSPARENCY TOGGLE
+-- ==========================================================
+
+local theme_state = require("theme.state")
+
+vim.keymap.set("n", "<leader>ut", function()
+	local current_state = theme_state.load()
+
+	current_state.transparent = not current_state.transparent
+	theme_state.save(current_state)
+
+	require("theme.apply").apply(current_state.theme)
+
+	vim.notify("Transparency: " .. (current_state.transparent and "ON" or "OFF"))
+end, {
+	desc = "UI: Toggle transparency",
+})
+
+-- ==========================================================
 -- MODULES
 -- ==========================================================
 
