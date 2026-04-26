@@ -30,6 +30,38 @@
 local keymap = vim.keymap.set
 
 -- ==========================================================
+-- VIRTUAL ENV (PYTHON)
+-- ==========================================================
+
+keymap("n", "<leader>pv", function()
+	local root = vim.fn.getcwd()
+	local venv_path = root .. "/.venv"
+
+	-- check if already exists
+	if vim.fn.isdirectory(venv_path) == 1 then
+		vim.notify(".venv already exists", vim.log.levels.INFO)
+		return
+	end
+
+	vim.notify("Creating Python virtual environment...")
+
+	vim.fn.jobstart({ "python", "-m", "venv", ".venv" }, {
+		cwd = root,
+		on_exit = function(_, code)
+			if code == 0 then
+				vim.schedule(function()
+					vim.notify(".venv created successfully", vim.log.levels.INFO)
+				end)
+			else
+				vim.schedule(function()
+					vim.notify("Failed to create .venv", vim.log.levels.ERROR)
+				end)
+			end
+		end,
+	})
+end, { desc = "Python: Create .venv" })
+
+-- ==========================================================
 -- FILE ACTIONS
 -- ==========================================================
 
