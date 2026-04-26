@@ -1,65 +1,112 @@
 -- ==========================================================
--- DEBUGGING (DAP)
+-- FILE: lua/core/keymaps/dap.lua
+-- ==========================================================
+-- PURPOSE
+-- -------
+-- Keymaps for debugging (nvim-dap).
+--
+-- WHY IT EXISTS
+-- -------------
+-- Debug keymaps should be available at startup without forcing
+-- nvim-dap to load immediately.
+--
+-- HOW IT WORKS
+-- ------------
+-- When a debug keymap is pressed, lazy.nvim loads nvim-dap.
+-- Then the requested dap action runs.
 -- ==========================================================
 
 local map = vim.keymap.set
 
--- ----------------------------------------------------------
+local function with_dap(callback)
+	local lazy_ok, lazy = pcall(require, "lazy")
+
+	if lazy_ok then
+		lazy.load({
+			plugins = {
+				"nvim-dap",
+			},
+		})
+	end
+
+	local ok, dap = pcall(require, "dap")
+
+	if not ok then
+		vim.notify("nvim-dap is not available", vim.log.levels.WARN)
+		return
+	end
+
+	callback(dap)
+end
+
+-- ==========================================================
 -- BREAKPOINTS
--- ----------------------------------------------------------
+-- ==========================================================
 
 map("n", "<leader>db", function()
-  require("dap").toggle_breakpoint()
-end)
+	with_dap(function(dap)
+		dap.toggle_breakpoint()
+	end)
+end, {
+	desc = "Debug: Toggle Breakpoint",
+})
 
-map("n", "<leader>dB", function()
-  require("dap").set_breakpoint(vim.fn.input("Condition: "))
-end)
-
-map("n", "<leader>dC", function()
-  require("dap").clear_breakpoints()
-end)
-
--- ----------------------------------------------------------
--- EXECUTION
--- ----------------------------------------------------------
+-- ==========================================================
+-- CONTROL
+-- ==========================================================
 
 map("n", "<leader>dc", function()
-  require("dap").continue()
-end)
+	with_dap(function(dap)
+		dap.continue()
+	end)
+end, {
+	desc = "Debug: Start/Continue",
+})
 
-map("n", "<leader>dR", function()
-  require("dap").restart()
-end)
+map("n", "<leader>dx", function()
+	with_dap(function(dap)
+		dap.terminate()
+	end)
+end, {
+	desc = "Debug: Stop",
+})
 
-map("n", "<leader>dt", function()
-  require("dap").terminate()
-end)
-
-map("n", "<leader>dl", function()
-  require("dap").run_last()
-end)
-
--- ----------------------------------------------------------
+-- ==========================================================
 -- STEPPING
--- ----------------------------------------------------------
+-- ==========================================================
 
 map("n", "<leader>di", function()
-  require("dap").step_into()
-end)
+	with_dap(function(dap)
+		dap.step_into()
+	end)
+end, {
+	desc = "Debug: Step Into",
+})
 
 map("n", "<leader>do", function()
-  require("dap").step_over()
-end)
+	with_dap(function(dap)
+		dap.step_over()
+	end)
+end, {
+	desc = "Debug: Step Over",
+})
 
 map("n", "<leader>dO", function()
-  require("dap").step_out()
-end)
+	with_dap(function(dap)
+		dap.step_out()
+	end)
+end, {
+	desc = "Debug: Step Out",
+})
 
--- ----------------------------------------------------------
--- UTILITIES
--- ----------------------------------------------------------
+-- ==========================================================
+-- REPL
+-- ==========================================================
 
 map("n", "<leader>dr", function()
-  require("dap").repl.open()
-end)
+	with_dap(function(dap)
+		dap.repl.open()
+	end)
+end, {
+	desc = "Debug: REPL",
+})
