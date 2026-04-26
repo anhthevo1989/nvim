@@ -148,6 +148,53 @@ function M.apply(theme_name)
 		fg = theme.border,
 		bg = theme.bg,
 	})
+
+	-- ======================================================
+	-- CMP (POPUP POLISH)
+	-- ======================================================
+
+	set("Pmenu", {
+		fg = theme.fg,
+		bg = theme.float_bg,
+	})
+
+	set("PmenuSel", {
+		fg = theme.bg,
+		bg = theme.accent.cyan,
+		bold = true,
+	})
+
+	set("PmenuSbar", {
+		bg = theme.bg_alt,
+	})
+
+	set("PmenuThumb", {
+		bg = theme.border,
+	})
+
+	-- optional but recommended (better grouping clarity)
+
+	set("CmpItemAbbr", {
+		fg = theme.fg,
+	})
+
+	set("CmpItemAbbrMatch", {
+		fg = theme.accent.cyan,
+		bold = true,
+	})
+
+	set("CmpItemAbbrMatchFuzzy", {
+		fg = theme.accent.cyan,
+		italic = true,
+	})
+
+	set("CmpItemMenu", {
+		fg = theme.fg_dark,
+	})
+
+	set("CmpItemKind", {
+		fg = theme.accent.blue,
+	})
 end
 
 function M.current()
