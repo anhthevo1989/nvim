@@ -123,6 +123,45 @@ keymap("t", "<Esc><Esc>", [[<C-\><C-n>]], {
 })
 
 -- ==========================================================
+-- THEME CYCLER
+-- ==========================================================
+
+local themes = {
+	-- Pulse variants
+	{ type = "pulse", name = "dark" },
+	{ type = "pulse", name = "light" },
+	{ type = "pulse", name = "high_contrast" },
+}
+
+local current_theme_index = 1
+
+local function apply_theme(entry)
+	if entry.type == "pulse" then
+		local ok, apply = pcall(require, "theme.apply")
+
+		if ok then
+			apply.apply(entry.name)
+			vim.notify("Pulse: " .. entry.name)
+		end
+	else
+		vim.cmd.colorscheme(entry.name)
+		vim.notify("Theme: " .. entry.name)
+	end
+end
+
+vim.keymap.set("n", "<leader>uc", function()
+	current_theme_index = current_theme_index + 1
+
+	if current_theme_index > #themes then
+		current_theme_index = 1
+	end
+
+	apply_theme(themes[current_theme_index])
+end, {
+	desc = "UI: Cycle Colors",
+})
+
+-- ==========================================================
 -- MODULES
 -- ==========================================================
 
