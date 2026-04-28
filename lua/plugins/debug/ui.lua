@@ -10,7 +10,8 @@
 -- - Right-side debug panel
 -- - Auto open on debug start
 -- - Auto close on debug end
--- - Does NOT interfere with IDE layout
+-- - Temporarily enters Zen layout while debugging
+-- - Restores IDE layout when debugging ends
 -- ==========================================================
 
 return {
@@ -49,19 +50,39 @@ return {
 		})
 
 		-- ======================================================
-		-- AUTO OPEN / CLOSE
+		-- DEBUG LAYOUT
 		-- ======================================================
 
+		local function enter_debug_layout()
+			pcall(function()
+				require("config.layout.ide").zen_layout()
+			end)
+
+			vim.schedule(function()
+				dapui.open()
+			end)
+		end
+
+		local function exit_debug_layout()
+			dapui.close()
+
+			vim.schedule(function()
+				pcall(function()
+					require("config.layout.ide").ide_layout()
+				end)
+			end)
+		end
+
 		dap.listeners.after.event_initialized["dapui_config"] = function()
-			dapui.open()
+			enter_debug_layout()
 		end
 
 		dap.listeners.before.event_terminated["dapui_config"] = function()
-			dapui.close()
+			exit_debug_layout()
 		end
 
 		dap.listeners.before.event_exited["dapui_config"] = function()
-			dapui.close()
+			exit_debug_layout()
 		end
 	end,
 }
