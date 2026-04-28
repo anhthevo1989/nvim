@@ -33,7 +33,7 @@ local M = {}
 function M.get_options()
 	return {
 		picker = { enabled = true },
-		notifier = { enabled = true },
+		notifier = { enabled = false },
 		input = { enabled = true },
 		scope = { enabled = true },
 
