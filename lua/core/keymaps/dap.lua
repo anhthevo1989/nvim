@@ -66,6 +66,16 @@ end, {
 map("n", "<leader>dx", function()
 	with_dap(function(dap)
 		dap.terminate()
+
+		pcall(function()
+			require("dapui").close()
+		end)
+
+		vim.schedule(function()
+			pcall(function()
+				require("config.layout.ide").ide_layout()
+			end)
+		end)
 	end)
 end, {
 	desc = "Debug: Stop",
