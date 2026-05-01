@@ -38,7 +38,7 @@ function M.get_options()
 		scope = { enabled = true },
 
 		dashboard = {
-			enabled = true,
+			enabled = false,
 
 			preset = {
 				header = [[
