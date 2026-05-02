@@ -26,7 +26,7 @@
 -- ICON [ ACTION ]   SHORTCUT
 -- ==========================================================
 
-local projects = require("config.snacks.projects")
+local projects = require("adapters.projects")
 
 local M = {}
 

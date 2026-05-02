@@ -29,7 +29,7 @@ local M = {}
 -- ==========================================================
 
 function M.projects()
-	require("config.snacks.projects").open_project_picker()
+	require("adapters.projects").open_project_picker()
 end
 
 -- ==========================================================
