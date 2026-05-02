@@ -22,7 +22,7 @@
 -- UI only. No workflow logic belongs here.
 -- ==========================================================
 
-local dashboard_actions = require("core.adapters.dashboard")
+local dashboard_actions = require("adapters.dashboard")
 
 return {
 	{
