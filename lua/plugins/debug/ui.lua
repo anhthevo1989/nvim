@@ -55,7 +55,7 @@ return {
 
 		local function enter_debug_layout()
 			pcall(function()
-				require("config.layout.ide").zen_layout()
+				require("adapters.layout").zen_layout()
 			end)
 
 			vim.schedule(function()
@@ -68,7 +68,7 @@ return {
 
 			vim.schedule(function()
 				pcall(function()
-					require("config.layout.ide").ide_layout()
+					require("adapters.layout").ide_layout()
 				end)
 			end)
 		end

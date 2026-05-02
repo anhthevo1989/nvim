@@ -73,7 +73,7 @@ map("n", "<leader>dx", function()
 
 		vim.schedule(function()
 			pcall(function()
-				require("config.layout.ide").ide_layout()
+				require("adapters.layout").ide_layout()
 			end)
 		end)
 	end)

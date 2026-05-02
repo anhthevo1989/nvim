@@ -71,7 +71,7 @@ function M.get_options()
 							vim.cmd("ene")
 
 							vim.schedule(function()
-								require("config.layout.ide").ide_layout()
+								require("adapters.layout").ide_layout()
 								vim.cmd("startinsert")
 							end)
 						end,

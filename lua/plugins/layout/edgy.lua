@@ -25,7 +25,7 @@
 -- BEGINNER NOTES
 -- --------------
 -- Edgy owns layout placement.
--- config.layout.ide owns automatic opening behavior.
+-- adapter.layout owns automatic opening behavior.
 -- ==========================================================
 
 return {
@@ -70,7 +70,7 @@ return {
 
 		config = function(_, opts)
 			require("edgy").setup(opts)
-			require("config.layout.ide").setup()
+			require("adapters.layout").setup()
 		end,
 	},
 }

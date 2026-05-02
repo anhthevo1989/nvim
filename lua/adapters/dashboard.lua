@@ -1,5 +1,5 @@
 -- ==========================================================
--- FILE: lua/core/adapters/dashboard.lua
+-- FILE: lua/adapters/dashboard.lua
 -- ==========================================================
 -- PURPOSE
 -- -------
@@ -40,7 +40,7 @@ function M.new_file()
 	vim.cmd("ene")
 
 	vim.schedule(function()
-		require("config.layout.ide").ide_layout()
+		require("adapters.layout").ide_layout()
 		vim.cmd("startinsert")
 	end)
 end
