@@ -14,7 +14,7 @@
 -- HOW IT WORKS
 -- ------------
 -- betterTerm creates a terminal area with internal terminal tabs.
--- Shell, Run, and LazyGit are predefined terminal targets.
+-- Shell, Run, Test, and LazyGit are predefined terminal targets.
 --
 -- FLOW
 -- ----
@@ -46,7 +46,8 @@ return {
 			predefined = {
 				{ index = 0, name = "Shell" },
 				{ index = 1, name = "Run" },
-				{ index = 2, name = "LazyGit" },
+				{ index = 2, name = "Test" },
+				{ index = 3, name = "LazyGit" },
 			},
 		},
 
@@ -55,21 +56,27 @@ return {
 
 			better_term.setup(opts)
 
-			vim.keymap.set("n", "<leader>tt", function()
+			vim.keymap.set("n", "<leader>Ts", function()
 				better_term.open(0)
 			end, {
 				desc = "Terminal Shell",
 			})
 
-			vim.keymap.set("n", "<leader>tr", function()
+			vim.keymap.set("n", "<leader>Tr", function()
 				better_term.open(1)
 			end, {
 				desc = "Terminal Run",
 			})
 
-			vim.keymap.set("n", "<leader>tg", function()
+			vim.keymap.set("n", "<leader>Tt", function()
 				better_term.open(2)
-				better_term.send("lazygit", 2)
+			end, {
+				desc = "Terminal Test",
+			})
+
+			vim.keymap.set("n", "<leader>Tg", function()
+				better_term.open(3)
+				better_term.send("lazygit", 3)
 			end, {
 				desc = "Terminal LazyGit",
 			})

@@ -187,5 +187,6 @@ end, {
 require("core.keymaps.lsp")
 require("core.keymaps.dap")
 require("core.keymaps.run")
+require("core.keymaps.test")
 require("core.keymaps.selection")
 require("core.keymaps.search")
