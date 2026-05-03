@@ -76,3 +76,13 @@ vim.diagnostic.config({
 		source = "always",
 	},
 })
+
+-- ==========================================================
+-- DISABLE MINI.INDENTSCOPE IN NEO-TREE
+-- ==========================================================
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = "neo-tree",
+	callback = function()
+		vim.b.miniindentscope_disable = true
+	end,
+})
