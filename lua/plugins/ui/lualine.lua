@@ -17,6 +17,7 @@ return {
 
 	config = function()
 		local theme = require("theme.dark").get()
+		local python = require("adapters.python")
 
 		local colors = {
 			bg = theme.bg,
@@ -69,7 +70,11 @@ return {
 				lualine_a = { "mode" },
 				lualine_b = { "branch", "diff" },
 				lualine_c = { "filename" },
-				lualine_x = { "encoding", "filetype" },
+				lualine_x = {
+					python.lualine_venv,
+					"encoding",
+					"filetype",
+				},
 				lualine_y = { "progress" },
 				lualine_z = { "location" },
 			},
