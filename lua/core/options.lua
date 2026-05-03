@@ -17,6 +17,8 @@
 
 local opt = vim.opt
 
+opt.showtabline = 2
+
 opt.number = true
 opt.relativenumber = true
 
