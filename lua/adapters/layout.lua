@@ -37,6 +37,21 @@ local function terminal_is_visible()
 end
 
 -- ==========================================================
+-- EDITOR FOCUS
+-- ==========================================================
+
+local function focus_editor_window()
+	for _, win in ipairs(vim.api.nvim_list_wins()) do
+		local buf = vim.api.nvim_win_get_buf(win)
+
+		if vim.bo[buf].buftype == "" then
+			vim.api.nvim_set_current_win(win)
+			return
+		end
+	end
+end
+
+-- ==========================================================
 -- FILE TREE (Neo-tree)
 -- ==========================================================
 
@@ -88,6 +103,7 @@ function M.open()
 	vim.schedule(function()
 		open_file_tree()
 		open_terminal()
+		focus_editor_window()
 	end)
 end
 
@@ -97,6 +113,7 @@ function M.ide_layout()
 	vim.schedule(function()
 		open_file_tree()
 		open_terminal()
+		focus_editor_window()
 	end)
 end
 
