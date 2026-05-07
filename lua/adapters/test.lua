@@ -93,27 +93,87 @@ local function send_to_test_terminal(command)
 	end, 100)
 end
 
+-- ==========================================================
+-- NEAREST PYTHON TEST DETECTION
+-- ==========================================================
+--
+-- Uses Treesitter to detect the nearest test function/class
+-- based on the user's current cursor position.
+--
+-- Supports:
+--
+-- def test_example():
+--
+-- class TestUser:
+--     def test_create_user():
+--
+-- Returns:
+--
+-- test_example
+--
+-- OR
+--
+-- TestUser::test_create_user
+-- ==========================================================
 local function nearest_python_test_name()
-	local cursor_line = vim.api.nvim_win_get_cursor(0)[1]
+	local cursor = vim.api.nvim_win_get_cursor(0)
+	local cursor_row = cursor[1] - 1
+	local cursor_col = cursor[2]
 
-	for line_number = cursor_line, 1, -1 do
-		local line = vim.api.nvim_buf_get_lines(
-			0,
-			line_number - 1,
-			line_number,
-			false
-		)[1]
+	local ok, parser = pcall(vim.treesitter.get_parser, 0, "python")
 
-		if line then
-			local test_name = line:match("^%s*def%s+(test[%w_]+)%s*%(")
-
-			if test_name then
-				return test_name
-			end
-		end
+	if not ok or not parser then
+		notify("Python Treesitter parser is not available", vim.log.levels.WARN)
+		return nil
 	end
 
-	return nil
+	local trees = parser:parse()
+
+	if not trees or not trees[1] then
+		notify("Python syntax tree is not available", vim.log.levels.WARN)
+		return nil
+	end
+
+	local root = trees[1]:root()
+
+	local node = root:named_descendant_for_range(cursor_row, cursor_col, cursor_row, cursor_col)
+
+	local test_function = nil
+	local test_class = nil
+
+	while node do
+		if node:type() == "function_definition" then
+			local name_node = node:field("name")[1]
+
+			if name_node then
+				local name = vim.treesitter.get_node_text(name_node, 0)
+
+				if name and vim.startswith(name, "test_") then
+					test_function = name
+				end
+			end
+		end
+
+		if node:type() == "class_definition" then
+			local name_node = node:field("name")[1]
+
+			if name_node then
+				local name = vim.treesitter.get_node_text(name_node, 0)
+
+				if name and vim.startswith(name, "Test") then
+					test_class = name
+				end
+			end
+		end
+
+		node = node:parent()
+	end
+
+	if test_class and test_function then
+		return test_class .. "::" .. test_function
+	end
+
+	return test_function
 end
 
 function M.test_current_file()
@@ -158,10 +218,7 @@ function M.test_nearest()
 
 	vim.cmd("write")
 
-	local command = pytest_command()
-		.. " "
-		.. shell_escape(file .. "::" .. test_name)
-		.. " -v"
+	local command = pytest_command() .. " " .. shell_escape(file .. "::" .. test_name) .. " -v"
 
 	send_to_test_terminal(command)
 end
