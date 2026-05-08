@@ -30,10 +30,16 @@
 
 return {
 	{
+		------------------------------------------
+		-- INSTALLATION
+		------------------------------------------
 		"folke/edgy.nvim",
 
 		event = "VeryLazy",
 
+		------------------------------------------
+		-- CONFIGURATION
+		------------------------------------------
 		init = function()
 			vim.opt.laststatus = 3
 			vim.opt.splitkeep = "screen"

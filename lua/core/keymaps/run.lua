@@ -26,6 +26,10 @@
 local map = vim.keymap.set
 local run = require("adapters.run")
 
+------------------------------------------
+-- RUN CURRENT FILE
+------------------------------------------
+
 map("n", "<leader>r", function()
 	run.run_current_file()
 end, {

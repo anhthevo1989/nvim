@@ -28,6 +28,10 @@
 local map = vim.keymap.set
 local test = require("adapters.test")
 
+------------------------------------------
+-- TEST KEYMAPS
+------------------------------------------
+
 map("n", "<leader>t", function()
 	test.test_current_file()
 end, {

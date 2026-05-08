@@ -1,77 +1,88 @@
 -- ==========================================================
 -- FILE: lua/adapters/python.lua
 -- ==========================================================
---
 -- PURPOSE
 -- -------
--- Provides Python project helpers for this Neovim config.
+-- Provide shared Python environment helpers.
 --
 -- WHY IT EXISTS
 -- -------------
--- Python workflow logic should stay separate from plugin setup, keymaps, and
--- editor defaults.
+-- Python workflows need a consistent interpreter.
+--
+-- This adapter helps the run system, test system, debug system,
+-- and statusline agree on which Python environment is active.
 --
 -- HOW IT WORKS
 -- ------------
--- Checks common virtual environment signals and returns a short display name
--- that other UI components can use.
+-- Checks for common virtual environment folders in the current
+-- project root.
+--
+-- If a virtual environment is found, its Python interpreter is used.
+-- If not, the system Python interpreter is used.
 --
 -- FLOW
 -- ----
--- Lualine asks for Python venv text -> this adapter checks the environment ->
--- lualine displays the result.
+-- Python workflow asks for interpreter
+-- → adapter checks project virtual environments
+-- → matching interpreter is returned
+-- → workflow uses that Python executable
 --
 -- BEGINNER NOTES
 -- --------------
--- A virtual environment is a project-specific Python environment. It keeps
--- dependencies isolated from the system Python installation.
+-- This file does not run Python code by itself.
+--
+-- It only tells other systems which Python executable to use.
 -- ==========================================================
 
 local M = {}
 
-local function path_exists(path)
-	return vim.uv.fs_stat(path) ~= nil
+------------------------------------------
+-- HELPERS
+------------------------------------------
+
+local function get_root()
+	return vim.fn.getcwd()
 end
 
-local function basename(path)
-	return vim.fn.fnamemodify(path, ":t")
-end
-
-local function find_project_venv()
-	local root = vim.fn.getcwd()
-	local candidates = {
-		root .. "/.venv",
-		root .. "/venv",
-		root .. "/env",
+local function get_candidates(root)
+	return {
+		root .. "/.venv/bin/python",
+		root .. "/venv/bin/python",
+		root .. "/env/bin/python",
 	}
+end
 
-	for _, path in ipairs(candidates) do
-		if path_exists(path) then
-			return basename(path)
+------------------------------------------
+-- PYTHON DETECTION
+------------------------------------------
+
+function M.find_python()
+	local root = get_root()
+	local candidates = get_candidates(root)
+
+	for _, python in ipairs(candidates) do
+		if vim.fn.executable(python) == 1 then
+			return python
 		end
 	end
 
-	return nil
-end
-
-function M.active_venv_name()
-	local virtual_env = vim.env.VIRTUAL_ENV
-
-	if virtual_env and virtual_env ~= "" then
-		return basename(virtual_env)
-	end
-
-	return find_project_venv()
+	return "python"
 end
 
 function M.lualine_venv()
-	local venv_name = M.active_venv_name()
+	local python = M.find_python()
 
-	if not venv_name then
-		return "Python: no venv"
+	if python == "python" then
+		return ""
 	end
 
-	return "Python: " .. venv_name
+	local venv = python:match("([^/]+)/bin/python$")
+
+	if not venv then
+		return ""
+	end
+
+	return " " .. venv
 end
 
 return M

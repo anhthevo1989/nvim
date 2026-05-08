@@ -5,11 +5,32 @@
 -- -------
 -- Bootstrap lazy.nvim and register plugin groups
 --
--- NOTES
--- -----
--- - This file ONLY wires plugin modules
--- - Each module returns a list of plugin specs
--- - No plugin configs should live here
+-- WHY IT EXISTS
+-- -------------
+-- This file is the plugin system entrypoint.
+-- It installs lazy.nvim if needed and tells lazy.nvim which
+-- plugin folders to load.
+--
+-- HOW IT WORKS
+-- ------------
+-- The lazy.nvim path is checked first.
+-- If lazy.nvim is missing, it is cloned into Neovim's data path.
+-- Then lazy.nvim loads each plugin group through import specs.
+--
+-- FLOW
+-- ----
+-- Neovim starts
+-- → this file bootstraps lazy.nvim
+-- → plugin groups are registered
+-- → lazy.nvim loads each plugin module
+--
+-- BEGINNER NOTES
+-- --------------
+-- This file should only wire plugin modules together.
+-- Individual plugin configuration belongs inside the matching
+-- plugin folder.
+--
+-- Do not put plugin setup logic directly in this file.
 -- ==========================================================
 
 -- ==========================================================

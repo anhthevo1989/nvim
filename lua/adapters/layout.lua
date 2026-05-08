@@ -3,16 +3,60 @@
 -- ==========================================================
 -- PURPOSE
 -- -------
--- Control IDE and Zen layout.
+-- Control IDE and Zen layout transitions.
+--
+-- WHY IT EXISTS
+-- -------------
+-- This adapter keeps layout behavior centralized so plugins do
+-- not fight over windows, sidebars, terminals, or focus.
+--
+-- It prevents:
+-- - terminal focus stealing
+-- - duplicate terminal windows
+-- - scattered layout commands
+-- - dashboard/project workflow layout bugs
+--
+-- HOW IT WORKS
+-- ------------
+-- The adapter opens and closes layout pieces through small helper
+-- functions.
+--
+-- It coordinates:
+-- - Neo-tree file explorer
+-- - betterTerm terminal
+-- - editor window focus
+-- - IDE layout mode
+-- - Zen layout mode
+--
+-- FLOW
+-- ----
+-- User opens a real file
+-- → IDE layout opens once
+-- → Neo-tree opens on the left
+-- → terminal opens at the bottom
+-- → editor focus is restored
+--
+-- User enters Zen layout
+-- → Neo-tree closes
+-- → terminal closes
+--
+-- BEGINNER NOTES
+-- --------------
+-- This file only coordinates layout.
+--
+-- Plugin configuration belongs in plugins/.
+-- Dashboard behavior belongs in adapters/dashboard.lua.
+-- Project selection belongs in adapters/projects.lua.
+-- Terminal execution belongs in run/test adapters.
 -- ==========================================================
 
 local M = {}
 
 local layout_has_opened = false
 
--- ==========================================================
+------------------------------------------
 -- HELPERS
--- ==========================================================
+------------------------------------------
 
 local function is_real_file_buffer()
 	return vim.api.nvim_buf_get_name(0) ~= "" and vim.bo.buftype == ""
@@ -36,9 +80,9 @@ local function terminal_is_visible()
 	return #get_visible_terminal_windows() > 0
 end
 
--- ==========================================================
+------------------------------------------
 -- EDITOR FOCUS
--- ==========================================================
+------------------------------------------
 
 local function focus_editor_window()
 	for _, win in ipairs(vim.api.nvim_list_wins()) do
@@ -51,9 +95,9 @@ local function focus_editor_window()
 	end
 end
 
--- ==========================================================
--- FILE TREE (Neo-tree)
--- ==========================================================
+------------------------------------------
+-- FILE TREE
+------------------------------------------
 
 local function open_file_tree()
 	vim.cmd("Neotree reveal left filesystem")
@@ -63,9 +107,9 @@ local function close_file_tree()
 	vim.cmd("Neotree close")
 end
 
--- ==========================================================
--- TERMINAL (betterTerm)
--- ==========================================================
+------------------------------------------
+-- TERMINAL
+------------------------------------------
 
 local function open_terminal()
 	if terminal_is_visible() then
@@ -89,9 +133,9 @@ local function close_terminal()
 	end
 end
 
--- ==========================================================
--- LAYOUT CONTROL
--- ==========================================================
+------------------------------------------
+-- PUBLIC LAYOUT ACTIONS
+------------------------------------------
 
 function M.open()
 	if layout_has_opened or not is_real_file_buffer() then
@@ -124,9 +168,9 @@ function M.zen_layout()
 	end)
 end
 
--- ==========================================================
+------------------------------------------
 -- SETUP
--- ==========================================================
+------------------------------------------
 
 function M.setup()
 	vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {

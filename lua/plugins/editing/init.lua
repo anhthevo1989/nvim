@@ -31,56 +31,112 @@
 return {
 
 	{
+		------------------------------------------
+		-- INSTALLATION
+		------------------------------------------
 		"echasnovski/mini.ai",
+
 		version = false,
+
+		------------------------------------------
+		-- CONFIGURATION
+		------------------------------------------
 		config = function()
 			require("mini.ai").setup()
 		end,
 	},
 
 	{
+		------------------------------------------
+		-- INSTALLATION
+		------------------------------------------
 		"echasnovski/mini.surround",
+
 		version = false,
+
+		------------------------------------------
+		-- CONFIGURATION
+		------------------------------------------
 		config = function()
 			require("mini.surround").setup()
 		end,
 	},
 
 	{
+		------------------------------------------
+		-- INSTALLATION
+		------------------------------------------
 		"echasnovski/mini.comment",
+
 		version = false,
+
+		------------------------------------------
+		-- CONFIGURATION
+		------------------------------------------
 		config = function()
 			require("mini.comment").setup()
 		end,
 	},
 
 	{
+		------------------------------------------
+		-- INSTALLATION
+		------------------------------------------
 		"windwp/nvim-autopairs",
+
 		event = "InsertEnter",
+
+		------------------------------------------
+		-- CONFIGURATION
+		------------------------------------------
 		config = function()
 			require("nvim-autopairs").setup()
 		end,
 	},
 
 	{
+		------------------------------------------
+		-- INSTALLATION
+		------------------------------------------
 		"echasnovski/mini.indentscope",
+
 		version = false,
+
+		------------------------------------------
+		-- CONFIGURATION
+		------------------------------------------
 		config = function()
 			require("mini.indentscope").setup()
 		end,
 	},
 
 	{
+		------------------------------------------
+		-- INSTALLATION
+		------------------------------------------
 		"echasnovski/mini.cursorword",
+
 		version = false,
+
+		------------------------------------------
+		-- CONFIGURATION
+		------------------------------------------
 		config = function()
 			require("mini.cursorword").setup()
 		end,
 	},
 
 	{
+		------------------------------------------
+		-- INSTALLATION
+		------------------------------------------
 		"echasnovski/mini.move",
+
 		event = "VeryLazy",
+
+		------------------------------------------
+		-- CONFIGURATION
+		------------------------------------------
 		config = function()
 			require("mini.move").setup({
 				mappings = {

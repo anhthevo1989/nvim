@@ -15,6 +15,12 @@
 -- It does not toggle closed.
 -- Zen layout is responsible for closing the explorer.
 --
+-- FLOW
+-- ----
+-- User presses <leader>ex
+-- → Neo-tree loads
+-- → file explorer opens/focuses left sidebar
+--
 -- BEGINNER NOTES
 -- --------------
 -- Use the :Neotree command for reliable lazy-loading.
@@ -22,7 +28,11 @@
 
 return {
 	{
+		------------------------------------------
+		-- INSTALLATION
+		------------------------------------------
 		"nvim-neo-tree/neo-tree.nvim",
+
 		branch = "v3.x",
 
 		dependencies = {
@@ -41,6 +51,9 @@ return {
 			},
 		},
 
+		------------------------------------------
+		-- CONFIGURATION
+		------------------------------------------
 		opts = {
 			close_if_last_window = true,
 			popup_border_style = "rounded",
@@ -49,6 +62,7 @@ return {
 				follow_current_file = {
 					enabled = true,
 				},
+
 				hijack_netrw_behavior = "open_default",
 			},
 

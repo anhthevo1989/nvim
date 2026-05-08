@@ -1,129 +1,118 @@
 -- ==========================================================
 -- FILE: lua/adapters/run.lua
 -- ==========================================================
---
 -- PURPOSE
 -- -------
--- Provides run commands for the current file.
+-- Run the current file using the correct command.
 --
 -- WHY IT EXISTS
 -- -------------
--- Running code is workflow logic. Keeping it in an adapter prevents keymaps
--- and plugin files from becoming messy.
+-- Running files should be consistent and predictable.
+--
+-- This adapter centralizes file execution so keymaps do not need
+-- to know language-specific run commands.
 --
 -- HOW IT WORKS
 -- ------------
--- Detects the current file type, builds the correct shell command, and sends
--- that command to the dedicated BetterTerm run terminal.
+-- Detects the current filetype, builds the correct command,
+-- then sends that command to the dedicated run terminal.
 --
 -- FLOW
 -- ----
--- User presses <leader>r -> keymap calls this adapter -> adapter saves the
--- current file -> adapter builds the run command -> BetterTerm opens the run
--- terminal and executes the command.
+-- User presses <leader>r
+-- → current filetype is detected
+-- → run command is built
+-- → command is sent to terminal 1
 --
 -- BEGINNER NOTES
 -- --------------
--- This file does not define keymaps. It only decides how files should run.
--- Keymaps live in lua/core/keymaps/run.lua.
+-- This file only decides how to run files.
+--
+-- Terminal behavior belongs to betterTerm.
+-- Python interpreter detection belongs to adapters/python.lua.
 -- ==========================================================
 
 local M = {}
 
-local RUN_TERMINAL_ID = 1
+------------------------------------------
+-- HELPERS
+------------------------------------------
 
-local function notify(message, level)
-	vim.notify(message, level or vim.log.levels.INFO, {
-		title = "Run",
-	})
+local function get_current_file()
+	return vim.fn.expand("%:p")
 end
 
-local function current_file()
-	local file = vim.fn.expand("%:p")
-
-	if file == "" then
-		return nil
-	end
-
-	return file
+local function get_filetype()
+	return vim.bo.filetype
 end
 
-local function file_extension(file)
-	return vim.fn.fnamemodify(file, ":e")
-end
-
-local function shell_escape(value)
+local function shellescape(value)
 	return vim.fn.shellescape(value)
-end
-
-local function find_python_command()
-	local virtual_env = vim.env.VIRTUAL_ENV
-
-	if virtual_env and virtual_env ~= "" then
-		return shell_escape(virtual_env .. "/bin/python")
-	end
-
-	local cwd = vim.fn.getcwd()
-	local project_python = cwd .. "/.venv/bin/python"
-
-	if vim.uv.fs_stat(project_python) then
-		return shell_escape(project_python)
-	end
-
-	return "python"
-end
-
-local function build_current_file_command(file)
-	local extension = file_extension(file)
-	local escaped_file = shell_escape(file)
-
-	if extension == "py" then
-		return find_python_command() .. " " .. escaped_file
-	end
-
-	if extension == "lua" then
-		return "lua " .. escaped_file
-	end
-
-	if extension == "sh" or extension == "bash" then
-		return "bash " .. escaped_file
-	end
-
-	return nil
 end
 
 local function send_to_run_terminal(command)
 	local ok, better_term = pcall(require, "betterTerm")
 
 	if not ok then
-		notify("BetterTerm is not available", vim.log.levels.ERROR)
+		vim.notify("betterTerm not available", vim.log.levels.WARN)
 		return
 	end
 
-	better_term.open(RUN_TERMINAL_ID)
-
-	vim.defer_fn(function()
-		better_term.send(command, RUN_TERMINAL_ID, {
-			clean = true,
-			interrupt = true,
-		})
-	end, 100)
+	better_term.open(1)
+	better_term.send(command, 1)
 end
 
-function M.run_current_file()
-	local file = current_file()
+------------------------------------------
+-- COMMAND BUILDERS
+------------------------------------------
 
-	if not file then
-		notify("No file is currently open", vim.log.levels.WARN)
+local function build_python_command(file)
+	local python = require("adapters.python").find_python()
+
+	return python .. " " .. shellescape(file)
+end
+
+local function build_lua_command(file)
+	return "lua " .. shellescape(file)
+end
+
+local function build_shell_command(file)
+	return "bash " .. shellescape(file)
+end
+
+local function build_command(filetype, file)
+	if filetype == "python" then
+		return build_python_command(file)
+	end
+
+	if filetype == "lua" then
+		return build_lua_command(file)
+	end
+
+	if filetype == "sh" or filetype == "bash" then
+		return build_shell_command(file)
+	end
+
+	return nil
+end
+
+------------------------------------------
+-- PUBLIC API
+------------------------------------------
+
+function M.run_current_file()
+	local file = get_current_file()
+	local filetype = get_filetype()
+
+	if file == "" then
+		vim.notify("No file to run", vim.log.levels.WARN)
 		return
 	end
 
-	vim.cmd("write")
-
-	local command = build_current_file_command(file)
+	local command = build_command(filetype, file)
 
 	if not command then
-		notify("No run command configured for this file type", vim.log.levels.WARN)
+		vim.notify("No run command configured for filetype: " .. filetype, vim.log.levels.WARN)
 		return
 	end
 

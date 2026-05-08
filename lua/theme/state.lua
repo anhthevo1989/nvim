@@ -36,6 +36,10 @@ local default = {
 	transparent = false,
 }
 
+------------------------------------------
+-- LOAD STATE
+------------------------------------------
+
 function M.load()
 	local ok, content = pcall(vim.fn.readfile, state_file)
 	if not ok then
@@ -49,6 +53,10 @@ function M.load()
 
 	return vim.tbl_deep_extend("force", default, data)
 end
+
+------------------------------------------
+-- SAVE STATE
+------------------------------------------
 
 function M.save(state)
 	local json = vim.fn.json_encode(state)

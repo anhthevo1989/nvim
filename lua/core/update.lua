@@ -14,23 +14,22 @@
 --
 -- This creates:
 --
---   :UpdateConfig
+-- :UpdateConfig
 --
 -- HOW IT WORKS
 -- ------------
 -- The command:
 --
--- 1. Finds the active Neovim config directory
--- 2. Fetches latest changes from GitHub
--- 3. Ensures user is on the stable branch
--- 4. Pulls latest updates
+-- 1. Finds active config directory
+-- 2. Fetches latest changes
+-- 3. Ensures stable branch
+-- 4. Pulls updates
 -- 5. Syncs plugins
 -- 6. Prompts restart
 --
 -- FLOW
 -- ----
 -- :UpdateConfig
---
 -- → git fetch
 -- → git checkout main
 -- → git pull --ff-only
@@ -39,26 +38,24 @@
 --
 -- BEGINNER NOTES
 -- --------------
--- This command ONLY updates from:
+-- This only updates from:
 --
---   main
+-- main
 --
--- The development branch is intentionally excluded.
--- Use Git/LazyGit manually if you're actively developing
--- the config itself.
+-- Development branches remain manual by design.
 -- ==========================================================
 
 local M = {}
 
--- ==========================================================
+------------------------------------------
 -- STABLE BRANCH
--- ==========================================================
+------------------------------------------
 
 local STABLE_BRANCH = "main"
 
--- ==========================================================
+------------------------------------------
 -- NOTIFICATIONS
--- ==========================================================
+------------------------------------------
 
 local function notify(message, level)
 	vim.notify(message, level or vim.log.levels.INFO, {
@@ -66,9 +63,9 @@ local function notify(message, level)
 	})
 end
 
--- ==========================================================
+------------------------------------------
 -- GIT COMMAND RUNNER
--- ==========================================================
+------------------------------------------
 
 local function run_git_command(config_dir, arguments)
 	local command = {
@@ -88,18 +85,18 @@ local function run_git_command(config_dir, arguments)
 	return result.code == 0, result.stdout, result.stderr
 end
 
--- ==========================================================
+------------------------------------------
 -- PLUGIN SYNC
--- ==========================================================
+------------------------------------------
 
 local function sync_plugins()
 	notify("Config updated. Syncing plugins...")
 	vim.cmd("Lazy sync")
 end
 
--- ==========================================================
+------------------------------------------
 -- RESTART PROMPT
--- ==========================================================
+------------------------------------------
 
 local function prompt_restart()
 	vim.defer_fn(function()
@@ -116,18 +113,18 @@ local function prompt_restart()
 	end, 1000)
 end
 
--- ==========================================================
+------------------------------------------
 -- MAIN UPDATE LOGIC
--- ==========================================================
+------------------------------------------
 
 function M.update_config()
 	local config_dir = vim.fn.stdpath("config")
 
 	notify("Updating config from stable branch...")
 
-	-- ======================================================
+	------------------------------------------
 	-- FETCH LATEST CHANGES
-	-- ======================================================
+	------------------------------------------
 
 	local fetch_ok, _, fetch_error = run_git_command(config_dir, {
 		"fetch",
@@ -139,9 +136,9 @@ function M.update_config()
 		return
 	end
 
-	-- ======================================================
+	------------------------------------------
 	-- ENSURE MAIN BRANCH
-	-- ======================================================
+	------------------------------------------
 
 	local checkout_ok, _, checkout_error = run_git_command(config_dir, {
 		"checkout",
@@ -153,9 +150,9 @@ function M.update_config()
 		return
 	end
 
-	-- ======================================================
+	------------------------------------------
 	-- PULL LATEST UPDATES
-	-- ======================================================
+	------------------------------------------
 
 	local pull_ok, _, pull_error = run_git_command(config_dir, {
 		"pull",
@@ -169,22 +166,22 @@ function M.update_config()
 		return
 	end
 
-	-- ======================================================
+	------------------------------------------
 	-- SYNC PLUGINS
-	-- ======================================================
+	------------------------------------------
 
 	sync_plugins()
 
-	-- ======================================================
+	------------------------------------------
 	-- PROMPT RESTART
-	-- ======================================================
+	------------------------------------------
 
 	prompt_restart()
 end
 
--- ==========================================================
+------------------------------------------
 -- USER COMMAND
--- ==========================================================
+------------------------------------------
 
 function M.setup()
 	vim.api.nvim_create_user_command("UpdateConfig", function()

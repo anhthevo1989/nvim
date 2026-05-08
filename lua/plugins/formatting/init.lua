@@ -14,11 +14,17 @@
 
 return {
 	{
+		------------------------------------------
+		-- INSTALLATION
+		------------------------------------------
 		"stevearc/conform.nvim",
 
 		event = { "BufWritePre" },
 		cmd = { "ConformInfo" },
 
+		------------------------------------------
+		-- CONFIGURATION
+		------------------------------------------
 		config = function()
 			local conform = require("conform")
 

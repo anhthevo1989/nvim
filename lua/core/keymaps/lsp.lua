@@ -1,6 +1,7 @@
 -- ==========================================================
 -- FILE: lua/core/keymaps/lsp.lua
 -- ==========================================================
+--
 -- PURPOSE
 -- -------
 -- Define LSP keymaps.
@@ -13,12 +14,23 @@
 -- ------------
 -- Uses LspAttach to register buffer-local mappings.
 --
+-- FLOW
+-- ----
+-- LSP server attaches
+-- → buffer-local keymaps are registered
+-- → LSP actions become available for that buffer
+--
 -- BEGINNER NOTES
 -- --------------
--- <leader>r = run / refactor namespace
+-- <leader>r = run / refactor namespace.
+-- These mappings are buffer-local because they depend on LSP.
 -- ==========================================================
 
 local keymap = vim.keymap.set
+
+------------------------------------------
+-- LSP ATTACH
+------------------------------------------
 
 vim.api.nvim_create_autocmd("LspAttach", {
 	group = vim.api.nvim_create_augroup("LspKeymaps", { clear = true }),
@@ -29,9 +41,9 @@ vim.api.nvim_create_autocmd("LspAttach", {
 			silent = true,
 		}
 
-		-- ======================================================
+		------------------------------------------
 		-- REFACTOR
-		-- ======================================================
+		------------------------------------------
 
 		keymap(
 			"n",
@@ -51,9 +63,9 @@ vim.api.nvim_create_autocmd("LspAttach", {
 			})
 		)
 
-		-- ======================================================
+		------------------------------------------
 		-- NAVIGATION
-		-- ======================================================
+		------------------------------------------
 
 		keymap(
 			"n",
@@ -91,9 +103,9 @@ vim.api.nvim_create_autocmd("LspAttach", {
 			})
 		)
 
-		-- ======================================================
+		------------------------------------------
 		-- INFO
-		-- ======================================================
+		------------------------------------------
 
 		vim.keymap.set("n", "K", function()
 			vim.lsp.buf.hover({
@@ -131,14 +143,12 @@ vim.api.nvim_create_autocmd("LspAttach", {
 			})
 		)
 
-		-- ==========================================================
+		------------------------------------------
 		-- DIAGNOSTICS KEYMAPS
-		-- ==========================================================
+		------------------------------------------
 		-- PURPOSE
 		-- -------
 		-- Provide quick access to diagnostics without clutter.
-
-		-- ==========================================================
 
 		-- show diagnostics for current line
 		vim.keymap.set("n", "<leader>dd", vim.diagnostic.open_float, {

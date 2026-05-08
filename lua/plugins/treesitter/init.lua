@@ -37,16 +37,21 @@
 -- ==========================================================
 
 return {
-	-- ==========================================================
-	-- INSTALLATION + CONFIGURATION: TREESITTER
-	-- ==========================================================
-
 	{
+		------------------------------------------
+		-- INSTALLATION
+		------------------------------------------
 		"nvim-treesitter/nvim-treesitter",
+
 		build = ":TSUpdate",
 
+		------------------------------------------
+		-- CONFIGURATION
+		------------------------------------------
 		config = function()
 			require("nvim-treesitter.config").setup({
+				install_dir = vim.fn.stdpath("data") .. "/site",
+
 				ensure_installed = {
 					"lua",
 					"python",
@@ -72,18 +77,21 @@ return {
 		end,
 	},
 
-	-- ==========================================================
-	-- INSTALLATION + CONFIGURATION: TREESITTER TEXTOBJECTS
-	-- ==========================================================
-
 	{
+		------------------------------------------
+		-- INSTALLATION
+		------------------------------------------
 		"nvim-treesitter/nvim-treesitter-textobjects",
+
 		branch = "main",
 
 		dependencies = {
 			"nvim-treesitter/nvim-treesitter",
 		},
 
+		------------------------------------------
+		-- CONFIGURATION
+		------------------------------------------
 		init = function()
 			vim.g.no_plugin_maps = true
 		end,

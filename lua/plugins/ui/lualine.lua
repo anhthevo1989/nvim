@@ -3,10 +3,56 @@
 -- ==========================================================
 -- PURPOSE
 -- -------
--- Statusline styled with Pulse theme
+-- Configure the Neovim statusline using lualine.
+--
+-- WHY IT EXISTS
+-- -------------
+-- Provides persistent editor status information while matching
+-- the Pulse theme system.
+--
+-- HOW IT WORKS
+-- ------------
+-- lazy.nvim installs lualine.
+-- This file builds a custom theme using Pulse colors and
+-- displays active editor information.
+--
+-- INSTALLATION
+-- ------------
+-- Installs:
+-- - nvim-lualine/lualine.nvim
+-- - nvim-web-devicons
+--
+-- CONFIGURATION
+-- -------------
+-- Configures:
+-- - Pulse color integration
+-- - editor mode display
+-- - git branch info
+-- - diff indicators
+-- - filename display
+-- - Python virtual environment indicator
+-- - cursor progress/location
+--
+-- FLOW
+-- ----
+-- Neovim starts
+-- → lualine loads
+-- → Pulse theme colors are pulled
+-- → statusline renders
+--
+-- BEGINNER NOTES
+-- --------------
+-- The Python virtual environment indicator comes from
+-- adapters/python.lua.
+--
+-- Statusline styling should remain here.
+-- Do not place workflow logic in this file.
 -- ==========================================================
 
 return {
+	------------------------------------------
+	-- INSTALLATION
+	------------------------------------------
 	"nvim-lualine/lualine.nvim",
 
 	event = "VeryLazy",
@@ -15,6 +61,9 @@ return {
 		"nvim-tree/nvim-web-devicons",
 	},
 
+	------------------------------------------
+	-- CONFIGURATION
+	------------------------------------------
 	config = function()
 		local theme = require("theme.dark").get()
 		local python = require("adapters.python")

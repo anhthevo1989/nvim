@@ -50,9 +50,9 @@ function M.apply(theme_name)
 	local float_bg = transparent and "NONE" or theme.float_bg
 	local alt_bg = transparent and "NONE" or theme.bg_alt
 
-	-- ======================================================
+	------------------------------------------
 	-- CORE EDITOR UI
-	-- ======================================================
+	------------------------------------------
 
 	set("Normal", { fg = theme.fg, bg = normal_bg })
 	set("NormalNC", { fg = theme.fg, bg = normal_bg })
@@ -72,17 +72,17 @@ function M.apply(theme_name)
 	set("StatusLine", { fg = theme.fg, bg = theme.bg_alt })
 	set("StatusLineNC", { fg = theme.fg_dark, bg = normal_bg })
 
-	-- ======================================================
+	------------------------------------------
 	-- SEARCH
-	-- ======================================================
+	------------------------------------------
 
 	set("Search", { fg = theme.bg, bg = theme.accent.yellow })
 	set("IncSearch", { fg = theme.bg, bg = theme.accent.orange })
 	set("CurSearch", { fg = theme.bg, bg = theme.accent.orange })
 
-	-- ======================================================
+	------------------------------------------
 	-- SYNTAX
-	-- ======================================================
+	------------------------------------------
 
 	set("Comment", { fg = theme.fg_dark, italic = true })
 	set("String", { fg = theme.accent.green })
@@ -105,9 +105,9 @@ function M.apply(theme_name)
 	set("Special", { fg = theme.accent.cyan })
 	set("PreProc", { fg = theme.accent.purple })
 
-	-- ======================================================
+	------------------------------------------
 	-- DIAGNOSTICS
-	-- ======================================================
+	------------------------------------------
 
 	set("DiagnosticError", { fg = theme.diag.error })
 	set("DiagnosticWarn", { fg = theme.diag.warn })
@@ -124,18 +124,18 @@ function M.apply(theme_name)
 	set("DiagnosticSignInfo", { fg = theme.diag.info, bg = normal_bg })
 	set("DiagnosticSignHint", { fg = theme.diag.hint, bg = normal_bg })
 
-	-- ======================================================
+	------------------------------------------
 	-- POPUP MENU
-	-- ======================================================
+	------------------------------------------
 
 	set("Pmenu", { fg = theme.fg, bg = theme.bg })
 	set("PmenuSel", { fg = theme.bg, bg = theme.accent.blue })
 	set("PmenuSbar", { bg = theme.bg_alt })
 	set("PmenuThumb", { bg = theme.border })
 
-	-- ======================================================
+	------------------------------------------
 	-- GIT / DIFF
-	-- ======================================================
+	------------------------------------------
 
 	set("DiffAdd", { fg = theme.git.add, bg = alt_bg })
 	set("DiffChange", { fg = theme.git.change, bg = alt_bg })
@@ -146,9 +146,9 @@ function M.apply(theme_name)
 	set("GitSignsChange", { fg = theme.git.change, bg = normal_bg })
 	set("GitSignsDelete", { fg = theme.git.delete, bg = normal_bg })
 
-	-- ======================================================
+	------------------------------------------
 	-- COMPLETION
-	-- ======================================================
+	------------------------------------------
 
 	set("CmpItemAbbr", { fg = theme.fg })
 	set("CmpItemAbbrDeprecated", { fg = theme.fg_dark, strikethrough = true })
@@ -157,9 +157,9 @@ function M.apply(theme_name)
 	set("CmpItemKind", { fg = theme.accent.purple })
 	set("CmpItemMenu", { fg = theme.fg_dark })
 
-	-- ======================================================
+	------------------------------------------
 	-- WHICH-KEY
-	-- ======================================================
+	------------------------------------------
 
 	set("WhichKey", { fg = theme.accent.cyan })
 	set("WhichKeyGroup", { fg = theme.accent.blue })
@@ -168,18 +168,18 @@ function M.apply(theme_name)
 	set("WhichKeyFloat", { bg = theme.bg })
 	set("WhichKeyBorder", { fg = theme.border, bg = theme.bg })
 
-	-- ======================================================
+	------------------------------------------
 	-- DASHBOARD
-	-- ======================================================
+	------------------------------------------
 
 	set("DashboardHeader", { fg = theme.accent.blue })
 	set("DashboardCenter", { fg = theme.fg })
 	set("DashboardShortcut", { fg = theme.accent.yellow })
 	set("DashboardFooter", { fg = theme.fg_dark })
 
-	-- ======================================================
+	------------------------------------------
 	-- NVIM-TREE
-	-- ======================================================
+	------------------------------------------
 
 	set("NvimTreeNormal", { fg = theme.fg, bg = normal_bg })
 	set("NvimTreeNormalNC", { fg = theme.fg, bg = normal_bg })
@@ -192,9 +192,9 @@ function M.apply(theme_name)
 	set("NvimTreeGitDeleted", { fg = theme.git.delete })
 	set("NvimTreeIndentMarker", { fg = theme.border })
 
-	-- ======================================================
+	------------------------------------------
 	-- NOICE / NOTIFICATIONS
-	-- ======================================================
+	------------------------------------------
 
 	set("NoiceCmdlinePopup", { fg = theme.fg, bg = theme.bg })
 	set("NoiceCmdlinePopupBorder", { fg = theme.accent.cyan, bg = theme.bg })
@@ -209,16 +209,16 @@ function M.apply(theme_name)
 	set("NotifyDEBUGBorder", { fg = theme.fg_dark, bg = theme.bg })
 	set("NotifyTRACEBorder", { fg = theme.accent.purple, bg = theme.bg })
 
-	-- ======================================================
+	------------------------------------------
 	-- DAP
-	-- ======================================================
+	------------------------------------------
 
 	set("DapBreakpoint", { fg = theme.diag.error })
 	set("DapStopped", { fg = theme.diag.warn })
 
-	-- ======================================================
+	------------------------------------------
 	-- TERMINAL COLORS
-	-- ======================================================
+	------------------------------------------
 
 	vim.g.terminal_color_0 = theme.bg_dark
 	vim.g.terminal_color_1 = theme.accent.red

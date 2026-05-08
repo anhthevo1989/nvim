@@ -28,13 +28,25 @@
 
 local M = {}
 
+------------------------------------------
+-- CONSTANTS
+------------------------------------------
+
 local TEST_TERMINAL_ID = 2
+
+------------------------------------------
+-- NOTIFICATIONS
+------------------------------------------
 
 local function notify(message, level)
 	vim.notify(message, level or vim.log.levels.INFO, {
 		title = "Test",
 	})
 end
+
+------------------------------------------
+-- CURRENT FILE HELPERS
+------------------------------------------
 
 local function current_file()
 	local file = vim.fn.expand("%:p")
@@ -53,6 +65,10 @@ end
 local function shell_escape(value)
 	return vim.fn.shellescape(value)
 end
+
+------------------------------------------
+-- PYTHON COMMAND DETECTION
+------------------------------------------
 
 local function find_python_command()
 	local virtual_env = vim.env.VIRTUAL_ENV
@@ -75,6 +91,10 @@ local function pytest_command()
 	return find_python_command() .. " -m pytest"
 end
 
+------------------------------------------
+-- TEST TERMINAL
+------------------------------------------
+
 local function send_to_test_terminal(command)
 	local ok, better_term = pcall(require, "betterTerm")
 
@@ -93,9 +113,9 @@ local function send_to_test_terminal(command)
 	end, 100)
 end
 
--- ==========================================================
+------------------------------------------
 -- NEAREST PYTHON TEST DETECTION
--- ==========================================================
+------------------------------------------
 --
 -- Uses Treesitter to detect the nearest test function/class
 -- based on the user's current cursor position.
@@ -114,7 +134,7 @@ end
 -- OR
 --
 -- TestUser::test_create_user
--- ==========================================================
+
 local function nearest_python_test_name()
 	local cursor = vim.api.nvim_win_get_cursor(0)
 	local cursor_row = cursor[1] - 1
@@ -176,6 +196,10 @@ local function nearest_python_test_name()
 	return test_function
 end
 
+------------------------------------------
+-- TEST CURRENT FILE
+------------------------------------------
+
 function M.test_current_file()
 	local file = current_file()
 
@@ -195,6 +219,10 @@ function M.test_current_file()
 
 	send_to_test_terminal(command)
 end
+
+------------------------------------------
+-- TEST NEAREST
+------------------------------------------
 
 function M.test_nearest()
 	local file = current_file()

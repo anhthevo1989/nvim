@@ -33,6 +33,9 @@
 
 return {
 	{
+		------------------------------------------
+		-- INSTALLATION
+		------------------------------------------
 		"folke/noice.nvim",
 
 		event = "VeryLazy",
@@ -42,6 +45,9 @@ return {
 			"rcarriga/nvim-notify",
 		},
 
+		------------------------------------------
+		-- CONFIGURATION
+		------------------------------------------
 		opts = {
 			cmdline = {
 				enabled = true,

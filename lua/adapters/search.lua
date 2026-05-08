@@ -29,6 +29,10 @@
 
 local M = {}
 
+------------------------------------------
+-- INPUT
+------------------------------------------
+
 local function input(prompt, callback)
 	local ok, snacks = pcall(require, "snacks")
 
@@ -40,6 +44,10 @@ local function input(prompt, callback)
 	vim.ui.input({ prompt = prompt }, callback)
 end
 
+------------------------------------------
+-- PROJECT ROOT
+------------------------------------------
+
 local function project_root()
 	local result = vim.system({ "git", "rev-parse", "--show-toplevel" }, { text = true }):wait()
 
@@ -50,6 +58,10 @@ local function project_root()
 	return vim.fn.getcwd()
 end
 
+------------------------------------------
+-- ESCAPING
+------------------------------------------
+
 local function escape_pattern(text)
 	return vim.pesc(text)
 end
@@ -58,11 +70,19 @@ local function escape_replacement(text)
 	return text:gsub("%%", "%%%%")
 end
 
+------------------------------------------
+-- NOTIFICATIONS
+------------------------------------------
+
 local function notify(message, level)
 	vim.notify(message, level or vim.log.levels.INFO, {
 		title = "Search / Replace",
 	})
 end
+
+------------------------------------------
+-- SEARCH IN FILE
+------------------------------------------
 
 function M.search_in_file()
 	input("Find: ", function(find_text)
@@ -80,6 +100,10 @@ function M.search_in_file()
 		end
 	end)
 end
+
+------------------------------------------
+-- SEARCH IN PROJECT
+------------------------------------------
 
 function M.search_in_project()
 	input("Find: ", function(find_text)
@@ -130,6 +154,10 @@ function M.search_in_project()
 	end)
 end
 
+------------------------------------------
+-- REPLACE IN FILE
+------------------------------------------
+
 function M.replace_in_file()
 	input("Find: ", function(find_text)
 		if not find_text or find_text == "" then
@@ -163,6 +191,10 @@ function M.replace_in_file()
 		end)
 	end)
 end
+
+------------------------------------------
+-- REPLACE IN PROJECT
+------------------------------------------
 
 function M.replace_in_project()
 	input("Find: ", function(find_text)

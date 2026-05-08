@@ -28,12 +28,18 @@
 -- ==========================================================
 
 return {
+	------------------------------------------
+	-- INSTALLATION
+	------------------------------------------
 	"jbyuki/one-small-step-for-vimkind",
 
 	dependencies = {
 		"mfussenegger/nvim-dap",
 	},
 
+	------------------------------------------
+	-- CONFIGURATION
+	------------------------------------------
 	config = function()
 		local dap = require("dap")
 

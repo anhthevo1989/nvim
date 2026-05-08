@@ -31,6 +31,9 @@
 
 return {
 	{
+		------------------------------------------
+		-- INSTALLATION
+		------------------------------------------
 		"romgrk/barbar.nvim",
 
 		event = "VeryLazy",
@@ -40,6 +43,9 @@ return {
 			"nvim-tree/nvim-web-devicons",
 		},
 
+		------------------------------------------
+		-- CONFIGURATION
+		------------------------------------------
 		init = function()
 			vim.g.barbar_auto_setup = false
 		end,
@@ -96,7 +102,9 @@ return {
 			maximum_length = 30,
 			minimum_length = 0,
 		},
-
+		------------------------------------------
+		-- KEYMAPS
+		------------------------------------------
 		keys = {
 			{
 				"<S-h>",

@@ -31,10 +31,16 @@
 
 return {
 	{
+		------------------------------------------
+		-- INSTALLATION
+		------------------------------------------
 		"CRAG666/betterTerm.nvim",
 
 		event = "VeryLazy",
 
+		------------------------------------------
+		-- CONFIGURATION
+		------------------------------------------
 		opts = {
 			prefix = "Terminal",
 			position = "bot",
@@ -55,6 +61,10 @@ return {
 			local better_term = require("betterTerm")
 
 			better_term.setup(opts)
+
+			------------------------------------------
+			-- KEYMAPS
+			------------------------------------------
 
 			vim.keymap.set("n", "<leader>Ts", function()
 				better_term.open(0)

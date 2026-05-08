@@ -26,13 +26,20 @@ local dashboard_actions = require("adapters.dashboard")
 
 return {
 	{
+		------------------------------------------
+		-- INSTALLATION
+		------------------------------------------
 		"nvimdev/dashboard-nvim",
+
 		event = "VimEnter",
 
 		dependencies = {
 			"nvim-tree/nvim-web-devicons",
 		},
 
+		------------------------------------------
+		-- CONFIGURATION
+		------------------------------------------
 		config = function()
 			local dashboard = require("dashboard")
 			local stats = require("lazy").stats()

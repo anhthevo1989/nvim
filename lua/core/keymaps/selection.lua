@@ -30,6 +30,10 @@
 
 local keymap = vim.keymap.set
 
+------------------------------------------
+-- TEXTOBJECT LOADER
+------------------------------------------
+
 local function load_textobjects()
 	local lazy_ok, lazy = pcall(require, "lazy")
 
@@ -41,6 +45,10 @@ local function load_textobjects()
 		})
 	end
 end
+
+------------------------------------------
+-- TEXTOBJECT SELECTION
+------------------------------------------
 
 local function select_textobject(textobject_name)
 	load_textobjects()
@@ -54,6 +62,10 @@ local function select_textobject(textobject_name)
 
 	textobject_select.select_textobject(textobject_name, "textobjects")
 end
+
+------------------------------------------
+-- BASIC SELECTIONS
+------------------------------------------
 
 keymap({ "n", "v" }, "<leader>sa", "ggVG", {
 	desc = "Select All",
@@ -74,6 +86,10 @@ keymap({ "n", "v" }, "<leader>sp", "vip", {
 keymap({ "n", "v" }, "<leader>sb", "vi{", {
 	desc = "Select Block",
 })
+
+------------------------------------------
+-- STRUCTURAL SELECTIONS
+------------------------------------------
 
 keymap({ "n", "v" }, "<leader>sf", function()
 	select_textobject("@function.outer")

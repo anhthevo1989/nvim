@@ -1,30 +1,46 @@
 -- ==========================================================
+-- FILE: lua/core/autocmds.lua
+-- ==========================================================
+--
 -- PURPOSE
--- Define automatic commands
+-- -------
+-- Define automatic commands.
 --
 -- WHY IT EXISTS
--- Automates repetitive behaviors
+-- -------------
+-- Automates repetitive editor behaviors.
 --
 -- HOW IT WORKS
--- Uses Neovim API to attach events
+-- ------------
+-- Uses Neovim API to attach callbacks to editor events.
 --
 -- FLOW
--- Runs when events are triggered
+-- ----
+-- Event occurs
+-- → autocmd triggers
+-- → callback runs
 --
 -- BEGINNER NOTES
--- Autocommands react to editor actions
+-- --------------
+-- Autocommands react to editor actions automatically.
 -- ==========================================================
 
 local autocmd = vim.api.nvim_create_autocmd
 
--- Highlight on yank
+------------------------------------------
+-- HIGHLIGHT ON YANK
+------------------------------------------
+
 autocmd("TextYankPost", {
 	callback = function()
 		vim.highlight.on_yank()
 	end,
 })
 
--- Remove trailing whitespace on save
+------------------------------------------
+-- REMOVE TRAILING WHITESPACE ON SAVE
+------------------------------------------
+
 autocmd("BufWritePre", {
 	callback = function()
 		local view = vim.fn.winsaveview()
@@ -33,9 +49,9 @@ autocmd("BufWritePre", {
 	end,
 })
 
--- ==========================================================
+------------------------------------------
 -- DIAGNOSTICS CONFIG
--- ==========================================================
+------------------------------------------
 -- PURPOSE
 -- -------
 -- Configure how diagnostics (errors, warnings, hints) display.
@@ -60,8 +76,6 @@ autocmd("BufWritePre", {
 -- 2. Neovim renders signs + underline
 -- 3. User opens float or toggles inline text
 
--- ==========================================================
-
 vim.diagnostic.config({
 	signs = true,
 	underline = true,
@@ -77,9 +91,10 @@ vim.diagnostic.config({
 	},
 })
 
--- ==========================================================
+------------------------------------------
 -- DISABLE MINI.INDENTSCOPE IN NEO-TREE
--- ==========================================================
+------------------------------------------
+
 vim.api.nvim_create_autocmd("FileType", {
 	pattern = "neo-tree",
 	callback = function()

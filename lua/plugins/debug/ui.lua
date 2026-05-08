@@ -15,6 +15,9 @@
 -- ==========================================================
 
 return {
+	------------------------------------------
+	-- INSTALLATION
+	------------------------------------------
 	"rcarriga/nvim-dap-ui",
 
 	dependencies = {
@@ -22,6 +25,9 @@ return {
 		"nvim-neotest/nvim-nio",
 	},
 
+	------------------------------------------
+	-- CONFIGURATION
+	------------------------------------------
 	config = function()
 		local dap = require("dap")
 		local dapui = require("dapui")
@@ -48,10 +54,6 @@ return {
 				},
 			},
 		})
-
-		-- ======================================================
-		-- DEBUG LAYOUT
-		-- ======================================================
 
 		local function enter_debug_layout()
 			pcall(function()

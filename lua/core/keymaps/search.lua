@@ -29,6 +29,10 @@
 
 local search = require("adapters.search")
 
+------------------------------------------
+-- SEARCH
+------------------------------------------
+
 vim.keymap.set("n", "<leader>Sf", search.search_in_file, {
 	desc = "Search in File",
 })
@@ -36,6 +40,10 @@ vim.keymap.set("n", "<leader>Sf", search.search_in_file, {
 vim.keymap.set("n", "<leader>Sp", search.search_in_project, {
 	desc = "Search in Project",
 })
+
+------------------------------------------
+-- REPLACE
+------------------------------------------
 
 vim.keymap.set("n", "<leader>Rf", search.replace_in_file, {
 	desc = "Replace in File",

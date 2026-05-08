@@ -1,22 +1,41 @@
 -- ==========================================================
 -- FILE: lua/core/keymaps/dap.lua
 -- ==========================================================
+--
 -- PURPOSE
 -- -------
--- Keymaps for debugging (nvim-dap).
+-- Defines keymaps for debugging workflows.
 --
 -- WHY IT EXISTS
 -- -------------
--- Debug keymaps should be available at startup without forcing
+-- Keeps debug keymaps available at startup without forcing
 -- nvim-dap to load immediately.
 --
 -- HOW IT WORKS
 -- ------------
--- When a debug keymap is pressed, lazy.nvim loads nvim-dap.
--- Then the requested dap action runs.
+-- When a debug keymap is pressed:
+--
+-- - lazy.nvim loads nvim-dap
+-- - dap is required
+-- - requested debug action executes
+--
+-- FLOW
+-- ----
+-- Key press
+-- → lazy load dap
+-- → execute debug action
+--
+-- BEGINNER NOTES
+-- --------------
+-- These mappings control breakpoints, stepping,
+-- execution flow, and the debug REPL.
 -- ==========================================================
 
 local map = vim.keymap.set
+
+------------------------------------------
+-- DAP LOADER
+------------------------------------------
 
 local function with_dap(callback)
 	local lazy_ok, lazy = pcall(require, "lazy")
@@ -39,9 +58,9 @@ local function with_dap(callback)
 	callback(dap)
 end
 
--- ==========================================================
+------------------------------------------
 -- BREAKPOINTS
--- ==========================================================
+------------------------------------------
 
 map("n", "<leader>db", function()
 	with_dap(function(dap)
@@ -51,9 +70,9 @@ end, {
 	desc = "Debug: Toggle Breakpoint",
 })
 
--- ==========================================================
--- CONTROL
--- ==========================================================
+------------------------------------------
+-- EXECUTION CONTROL
+------------------------------------------
 
 map("n", "<leader>dc", function()
 	with_dap(function(dap)
@@ -81,9 +100,9 @@ end, {
 	desc = "Debug: Stop",
 })
 
--- ==========================================================
+------------------------------------------
 -- STEPPING
--- ==========================================================
+------------------------------------------
 
 map("n", "<leader>di", function()
 	with_dap(function(dap)
@@ -109,9 +128,9 @@ end, {
 	desc = "Debug: Step Out",
 })
 
--- ==========================================================
+------------------------------------------
 -- REPL
--- ==========================================================
+------------------------------------------
 
 map("n", "<leader>dr", function()
 	with_dap(function(dap)

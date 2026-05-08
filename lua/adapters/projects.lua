@@ -3,92 +3,116 @@
 -- ==========================================================
 -- PURPOSE
 -- -------
--- Provide project selection for the Snacks dashboard.
+-- Handle project discovery and project opening workflows.
 --
 -- WHY IT EXISTS
 -- -------------
--- The dashboard needs a PROJECTS action that lists folders
--- from ~/Projects and changes into the selected project.
+-- Keeps project-opening logic separate from dashboard UI.
+--
+-- This allows:
+-- - dashboard reuse
+-- - cleaner project workflows
+-- - easier future dashboard replacement
 --
 -- HOW IT WORKS
 -- ------------
--- This file scans ~/Projects.
--- It shows the folders with vim.ui.select().
--- When a project is selected, Neovim changes directory into it
--- and opens the Snacks file picker there.
+-- Scans the user's project directory for repositories,
+-- displays them through Snacks picker,
+-- then opens the selected project.
 --
 -- FLOW
 -- ----
--- 1. User selects PROJECTS from dashboard.
--- 2. This file scans ~/Projects.
--- 3. User chooses a project folder.
--- 4. Neovim changes directory into that folder.
--- 5. Snacks file picker opens inside that project.
+-- User presses Projects
+-- → project picker opens
+-- → user selects project
+-- → project files open
+-- → IDE layout initializes
 --
 -- BEGINNER NOTES
 -- --------------
--- This file only handles project discovery and project opening.
+-- This adapter only handles project selection.
+--
+-- Dashboard UI belongs in dashboard.lua
+-- Layout transitions belong in layout.lua
 -- ==========================================================
 
 local M = {}
 
-local projects_directory = vim.fn.expand("~/Projects")
+------------------------------------------
+-- CONFIG
+------------------------------------------
 
-local function get_project_directories()
-	local project_directories = {}
-	local scan_handle = vim.loop.fs_scandir(projects_directory)
+local PROJECTS_DIR = vim.fn.expand("~/Projects")
 
-	if not scan_handle then
-		vim.notify("Projects directory not found: " .. projects_directory, vim.log.levels.WARN)
-		return project_directories
+------------------------------------------
+-- HELPERS
+------------------------------------------
+
+local function get_projects()
+	local projects = {}
+
+	local handle = vim.loop.fs_scandir(PROJECTS_DIR)
+
+	if not handle then
+		return projects
 	end
 
 	while true do
-		local name, item_type = vim.loop.fs_scandir_next(scan_handle)
+		local name, type = vim.loop.fs_scandir_next(handle)
 
 		if not name then
 			break
 		end
 
-		if item_type == "directory" then
-			table.insert(project_directories, {
+		if type == "directory" then
+			table.insert(projects, {
 				name = name,
-				path = projects_directory .. "/" .. name,
+				path = PROJECTS_DIR .. "/" .. name,
 			})
 		end
 	end
 
-	table.sort(project_directories, function(left_project, right_project)
-		return left_project.name:lower() < right_project.name:lower()
+	table.sort(projects, function(a, b)
+		return a.name < b.name
 	end)
 
-	return project_directories
+	return projects
 end
 
-function M.open_project_picker()
-	local project_directories = get_project_directories()
+------------------------------------------
+-- PROJECT PICKER
+------------------------------------------
 
-	if #project_directories == 0 then
-		vim.notify("No projects found in " .. projects_directory, vim.log.levels.WARN)
+function M.open_project_picker()
+	local projects = get_projects()
+
+	if #projects == 0 then
+		vim.notify("No projects found in ~/Projects", vim.log.levels.WARN)
 		return
 	end
 
-	vim.ui.select(project_directories, {
-		prompt = "Projects",
-		format_item = function(project)
-			return project.name
+	Snacks.picker.pick({
+		title = "Projects",
+		items = projects,
+
+		format = function(item)
+			return item.name
 		end,
-	}, function(project)
-		if not project then
-			return
-		end
 
-		vim.cmd("cd " .. vim.fn.fnameescape(project.path))
+		confirm = function(picker, item)
+			picker:close()
 
-		Snacks.picker.files({
-			cwd = project.path,
-		})
-	end)
+			vim.cmd("cd " .. item.path)
+
+			Snacks.picker.files({
+				cwd = item.path,
+			})
+
+			vim.schedule(function()
+				require("adapters.layout").ide_layout()
+			end)
+		end,
+	})
 end
 
 return M
