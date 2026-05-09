@@ -35,6 +35,11 @@ return {
 
 	dependencies = {
 		"mfussenegger/nvim-dap",
+
+		{
+			"tomblind/local-lua-debugger-vscode",
+			build = "npm install && npm run build",
+		},
 	},
 
 	------------------------------------------
@@ -42,6 +47,10 @@ return {
 	------------------------------------------
 	config = function()
 		local dap = require("dap")
+
+		------------------------------------------
+		-- NEOVIM LUA DEBUGGING
+		------------------------------------------
 
 		local port = 8086
 
@@ -52,6 +61,21 @@ return {
 				port = port,
 			})
 		end
+
+		------------------------------------------
+		-- STANDALONE LUA DEBUGGING
+		------------------------------------------
+		dap.adapters["local-lua"] = {
+			type = "executable",
+			command = "node",
+			args = {
+				vim.fn.stdpath("data") .. "/lazy/local-lua-debugger-vscode/extension/debugAdapter.js",
+			},
+		}
+
+		------------------------------------------
+		-- LUA DEBUG CONFIGURATIONS
+		------------------------------------------
 
 		dap.configurations.lua = {
 			{
@@ -65,6 +89,22 @@ return {
 						port = port,
 					})
 				end,
+			},
+
+			{
+				name = "Debug Standalone Lua File",
+				type = "local-lua",
+				request = "launch",
+				cwd = "${workspaceFolder}",
+
+				program = {
+					lua = "luajit",
+					file = "${file}",
+				},
+
+				args = {},
+
+				extensionPath = vim.fn.stdpath("data") .. "/lazy/local-lua-debugger-vscode",
 			},
 		}
 	end,

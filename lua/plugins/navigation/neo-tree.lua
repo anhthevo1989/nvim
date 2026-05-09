@@ -60,7 +60,7 @@ return {
 
 			filesystem = {
 				follow_current_file = {
-					enabled = true,
+					enabled = false,
 				},
 
 				hijack_netrw_behavior = "open_default",
