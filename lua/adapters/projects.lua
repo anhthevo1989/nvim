@@ -16,8 +16,9 @@
 --
 -- HOW IT WORKS
 -- ------------
--- Scans the user's project directory for repositories,
+-- Scans the user's project directory for folders,
 -- displays them through Snacks picker,
+-- previews their contents,
 -- then opens the selected project.
 --
 -- FLOW
@@ -58,16 +59,18 @@ local function get_projects()
 	end
 
 	while true do
-		local name, type = vim.loop.fs_scandir_next(handle)
+		local name, entry_type = vim.loop.fs_scandir_next(handle)
 
 		if not name then
 			break
 		end
 
-		if type == "directory" then
+		if entry_type == "directory" then
 			table.insert(projects, {
 				name = name,
 				path = PROJECTS_DIR .. "/" .. name,
+				file = PROJECTS_DIR .. "/" .. name,
+				dir = true,
 			})
 		end
 	end
@@ -77,6 +80,57 @@ local function get_projects()
 	end)
 
 	return projects
+end
+
+local function get_project_preview_lines(project)
+	local lines = {
+		project.name,
+		string.rep("=", #project.name),
+		"",
+		project.path,
+		"",
+		"Contents",
+		"--------",
+	}
+
+	local handle = vim.loop.fs_scandir(project.path)
+
+	if not handle then
+		table.insert(lines, "Unable to read project directory.")
+		return lines
+	end
+
+	local count = 0
+
+	while true do
+		local name, entry_type = vim.loop.fs_scandir_next(handle)
+
+		if not name then
+			break
+		end
+
+		count = count + 1
+
+		local icon = "󰈔"
+
+		if entry_type == "directory" then
+			icon = "󰉋"
+		end
+
+		table.insert(lines, icon .. " " .. name)
+
+		if count >= 30 then
+			table.insert(lines, "")
+			table.insert(lines, "Preview limited to first 30 entries.")
+			break
+		end
+	end
+
+	if count == 0 then
+		table.insert(lines, "No visible entries found.")
+	end
+
+	return lines
 end
 
 ------------------------------------------
@@ -96,21 +150,41 @@ function M.open_project_picker()
 		items = projects,
 
 		format = function(item)
-			return item.name
+			return {
+				{
+					item.name,
+					"Directory",
+				},
+			}
+		end,
+
+		preview = function(ctx)
+			ctx.preview:set_lines(get_project_preview_lines(ctx.item))
 		end,
 
 		confirm = function(picker, item)
 			picker:close()
 
-			vim.cmd("cd " .. item.path)
+			vim.cmd("cd " .. vim.fn.fnameescape(item.path))
 
 			Snacks.picker.files({
 				cwd = item.path,
-			})
+				hidden = true,
+				ignored = false,
 
-			vim.schedule(function()
-				require("adapters.layout").ide_layout()
-			end)
+				confirm = function(file_picker, file_item)
+					file_picker:close()
+
+					local file = file_item.file or file_item.path
+					if file then
+						vim.cmd("edit " .. vim.fn.fnameescape(file))
+					end
+
+					vim.schedule(function()
+						require("adapters.layout").ide_layout()
+					end)
+				end,
+			})
 		end,
 	})
 end
