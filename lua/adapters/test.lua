@@ -13,17 +13,32 @@
 --
 -- HOW IT WORKS
 -- ------------
--- Detects Python test files, builds pytest commands, and sends those commands
--- to the dedicated BetterTerm test terminal.
+-- Detects the current file type, builds the correct test command, and sends
+-- that command to the dedicated BetterTerm test terminal.
+--
+-- Supported workflows:
+--
+-- - Python uses pytest
+-- - Lua uses busted
+-- - Shell uses bats
 --
 -- FLOW
 -- ----
--- User presses <leader>t or <leader>tn -> adapter saves file -> adapter builds
--- pytest command -> BetterTerm executes tests in terminal 2.
+-- User presses <leader>t or <leader>tn
+-- -> adapter saves file
+-- -> adapter detects language
+-- -> adapter builds test command
+-- -> BetterTerm executes tests in terminal 2.
 --
 -- BEGINNER NOTES
 -- --------------
--- V1 only supports Python tests. Lua and Bash test support can be added later.
+-- <leader>t runs the current test file.
+--
+-- <leader>tn runs the nearest test when the cursor is inside a supported test
+-- block.
+--
+-- Shell scripts are run through Bats test files. Normal shell execution belongs
+-- to the run adapter, not the test adapter.
 -- ==========================================================
 
 local M = {}
@@ -64,6 +79,26 @@ end
 
 local function shell_escape(value)
 	return vim.fn.shellescape(value)
+end
+
+local function file_exists(file)
+	return vim.uv.fs_stat(file) ~= nil
+end
+
+local function executable_exists(command)
+	return vim.fn.executable(command) == 1
+end
+
+------------------------------------------
+-- PATTERN HELPERS
+------------------------------------------
+
+local function escape_lua_pattern(value)
+	return value:gsub("([^%w])", "%%%1")
+end
+
+local function escape_regex_pattern(value)
+	return value:gsub("([%(%)%.%%%+%-%*%?%[%]%^%$])", "\\%1")
 end
 
 ------------------------------------------
@@ -116,24 +151,6 @@ end
 ------------------------------------------
 -- NEAREST PYTHON TEST DETECTION
 ------------------------------------------
---
--- Uses Treesitter to detect the nearest test function/class
--- based on the user's current cursor position.
---
--- Supports:
---
--- def test_example():
---
--- class TestUser:
---     def test_create_user():
---
--- Returns:
---
--- test_example
---
--- OR
---
--- TestUser::test_create_user
 
 local function nearest_python_test_name()
 	local cursor = vim.api.nvim_win_get_cursor(0)
@@ -197,6 +214,92 @@ local function nearest_python_test_name()
 end
 
 ------------------------------------------
+-- NEAREST LUA TEST DETECTION
+------------------------------------------
+
+local function nearest_lua_test_name()
+	local cursor = vim.api.nvim_win_get_cursor(0)
+	local cursor_line = cursor[1]
+
+	for line_number = cursor_line, 1, -1 do
+		local line = vim.api.nvim_buf_get_lines(0, line_number - 1, line_number, false)[1]
+
+		if line then
+			local double_quote_name = line:match('it%s*%(%s*"([^"]+)"')
+			local single_quote_name = line:match("it%s*%(%s*'([^']+)'")
+
+			if double_quote_name then
+				return double_quote_name
+			end
+
+			if single_quote_name then
+				return single_quote_name
+			end
+		end
+	end
+
+	return nil
+end
+
+------------------------------------------
+-- NEAREST BATS TEST DETECTION
+------------------------------------------
+
+local function nearest_bats_test_name()
+	local cursor = vim.api.nvim_win_get_cursor(0)
+	local cursor_line = cursor[1]
+
+	for line_number = cursor_line, 1, -1 do
+		local line = vim.api.nvim_buf_get_lines(0, line_number - 1, line_number, false)[1]
+
+		if line then
+			local double_quote_name = line:match('@test%s+"([^"]+)"')
+			local single_quote_name = line:match("@test%s+'([^']+)'")
+
+			if double_quote_name then
+				return double_quote_name
+			end
+
+			if single_quote_name then
+				return single_quote_name
+			end
+		end
+	end
+
+	return nil
+end
+
+------------------------------------------
+-- SHELL TEST FILE DETECTION
+------------------------------------------
+
+local function shell_test_file_for(file)
+	local extension = file_extension(file)
+
+	if extension == "bats" then
+		return file
+	end
+
+	local directory = vim.fn.fnamemodify(file, ":h")
+	local base_name = vim.fn.fnamemodify(file, ":t:r")
+
+	local candidates = {
+		directory .. "/" .. base_name .. ".bats",
+		directory .. "/" .. base_name .. "_test.bats",
+		directory .. "/" .. base_name .. "-test.bats",
+		directory .. "/test.bats",
+	}
+
+	for _, candidate in ipairs(candidates) do
+		if file_exists(candidate) then
+			return candidate
+		end
+	end
+
+	return nil
+end
+
+------------------------------------------
 -- TEST CURRENT FILE
 ------------------------------------------
 
@@ -208,16 +311,46 @@ function M.test_current_file()
 		return
 	end
 
-	if file_extension(file) ~= "py" then
-		notify("Only Python tests are supported in V1", vim.log.levels.WARN)
-		return
-	end
+	local extension = file_extension(file)
 
 	vim.cmd("write")
 
-	local command = pytest_command() .. " " .. shell_escape(file) .. " -v"
+	if extension == "py" then
+		local command = pytest_command() .. " " .. shell_escape(file) .. " -v"
+		send_to_test_terminal(command)
+		return
+	end
 
-	send_to_test_terminal(command)
+	if extension == "lua" then
+		if not executable_exists("busted") then
+			notify("busted is not installed or not on PATH", vim.log.levels.ERROR)
+			return
+		end
+
+		local command = "busted " .. shell_escape(file)
+		send_to_test_terminal(command)
+		return
+	end
+
+	if extension == "sh" or extension == "bats" then
+		if not executable_exists("bats") then
+			notify("bats is not installed or not on PATH", vim.log.levels.ERROR)
+			return
+		end
+
+		local test_file = shell_test_file_for(file)
+
+		if not test_file then
+			notify("No Bats test file found for current shell file", vim.log.levels.WARN)
+			return
+		end
+
+		local command = "bats " .. shell_escape(test_file)
+		send_to_test_terminal(command)
+		return
+	end
+
+	notify("No test runner configured for ." .. extension .. " files", vim.log.levels.WARN)
 end
 
 ------------------------------------------
@@ -232,23 +365,76 @@ function M.test_nearest()
 		return
 	end
 
-	if file_extension(file) ~= "py" then
-		notify("Only Python nearest-test is supported in V1", vim.log.levels.WARN)
-		return
-	end
-
-	local test_name = nearest_python_test_name()
-
-	if not test_name then
-		notify("No nearest Python test function found", vim.log.levels.WARN)
-		return
-	end
+	local extension = file_extension(file)
 
 	vim.cmd("write")
 
-	local command = pytest_command() .. " " .. shell_escape(file .. "::" .. test_name) .. " -v"
+	if extension == "py" then
+		local test_name = nearest_python_test_name()
 
-	send_to_test_terminal(command)
+		if not test_name then
+			notify("No nearest Python test function found", vim.log.levels.WARN)
+			return
+		end
+
+		local command = pytest_command() .. " " .. shell_escape(file .. "::" .. test_name) .. " -v"
+		send_to_test_terminal(command)
+		return
+	end
+
+	if extension == "lua" then
+		if not executable_exists("busted") then
+			notify("busted is not installed or not on PATH", vim.log.levels.ERROR)
+			return
+		end
+
+		local test_name = nearest_lua_test_name()
+
+		if not test_name then
+			notify("No nearest Lua it() block found", vim.log.levels.WARN)
+			return
+		end
+
+		local pattern = escape_lua_pattern(test_name)
+		local command = "busted " .. shell_escape(file) .. " --filter " .. shell_escape(pattern)
+
+		send_to_test_terminal(command)
+		return
+	end
+
+	if extension == "sh" or extension == "bats" then
+		if not executable_exists("bats") then
+			notify("bats is not installed or not on PATH", vim.log.levels.ERROR)
+			return
+		end
+
+		local test_file = shell_test_file_for(file)
+
+		if not test_file then
+			notify("No Bats test file found for current shell file", vim.log.levels.WARN)
+			return
+		end
+
+		if extension ~= "bats" then
+			notify("Open the .bats file to run nearest shell test", vim.log.levels.WARN)
+			return
+		end
+
+		local test_name = nearest_bats_test_name()
+
+		if not test_name then
+			notify("No nearest Bats @test block found", vim.log.levels.WARN)
+			return
+		end
+
+		local pattern = escape_regex_pattern(test_name)
+		local command = "bats " .. shell_escape(test_file) .. " --filter " .. shell_escape(pattern)
+
+		send_to_test_terminal(command)
+		return
+	end
+
+	notify("No nearest-test runner configured for ." .. extension .. " files", vim.log.levels.WARN)
 end
 
 return M
