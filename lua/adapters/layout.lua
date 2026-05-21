@@ -180,6 +180,10 @@ function M.setup()
 		end,
 	})
 
+	vim.schedule(function()
+		M.open()
+	end)
+
 	vim.keymap.set("n", "<leader>li", M.ide_layout, {
 		desc = "IDE Layout",
 	})
